@@ -50,7 +50,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 new XsltSimple1(),
                 new XsltSimple2(),
                 new XsltSimple3(),
-                //new XsltStripSpace(),
+                new XsltStripSpace(),
                 new XsltReuseExecutable(),
                 new XsltReuseTransformer(),
                 new XsltFilterChain(),
@@ -584,52 +584,52 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
     }
 
 
-    ///// <summary>
-    ///// XSLT 2.0 transformation showing stripping of whitespace controlled by the stylesheet
-    ///// </summary>
+    /// <summary>
+    /// XSLT 3.0 transformation showing stripping of whitespace controlled by the stylesheet
+    /// </summary>
 
-    //public class XsltStripSpace : Example
-    //{
+    public class XsltStripSpace : Example
+    {
 
-    //    public override string testName => "XsltStripSpace";
+        public override string testName => "XsltStripSpace";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        Processor processor = new(false);
+        public override void run(URL samplesDir)
+        {
+            Processor processor = new(false);
 
-    //        // Load the source document
-    //        DocumentBuilder builder = processor.newDocumentBuilder();
-    //        builder.BaseUri = samplesDir;
+            // Load the source document
+            DocumentBuilder builder = processor.newDocumentBuilder();
+            builder.setBaseURI(samplesDir.toURI());
 
-    //        String doc = "<doc>  <a>  <b>text</b>  </a>  <a/>  </doc>";
-    //        MemoryStream ms = new();
-    //        StreamWriter tw = new(ms);
-    //        tw.Write(doc);
-    //        tw.Flush();
-    //        Stream instr = new MemoryStream(ms.GetBuffer(), 0, (int)ms.Length);
-    //        XdmNode input = builder.Build(instr);
+            String doc = "<doc>  <a>  <b>text</b>  </a>  <a/>  </doc>";
+            //MemoryStream ms = new();
+            //StreamWriter tw = new(ms);
+            //tw.Write(doc);
+            //tw.Flush();
+            //Stream instr = new MemoryStream(ms.GetBuffer(), 0, (int)ms.Length);
+            XdmNode input = builder.build(new StreamSource(new StringReader(doc)));
 
-    //        // Create a transformer for the stylesheet.
-    //        String stylesheet =
-    //            "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='2.0'>" +
-    //            "<xsl:strip-space elements='*'/>" +
-    //            "<xsl:template match='/'>" +
-    //            "  <xsl:copy-of select='.'/>" +
-    //            "</xsl:template>" +
-    //            "</xsl:stylesheet>";
+            // Create a transformer for the stylesheet.
+            String stylesheet =
+                "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='3.0'>" +
+                "<xsl:strip-space elements='*'/>" +
+                "<xsl:template match='/'>" +
+                "  <xsl:copy-of select='.'/>" +
+                "</xsl:template>" +
+                "</xsl:stylesheet>";
 
-    //        XsltCompiler compiler = processor.newXsltCompiler();
-    //        compiler.BaseUri = samplesDir;
-    //        Xslt30Transformer transformer = compiler.compile(new XmlTextReader(new StringReader(stylesheet))).load30();
+            XsltCompiler compiler = processor.newXsltCompiler();
+            //compiler.BaseUri = samplesDir;
+            Xslt30Transformer transformer = compiler.compile(new StreamSource(new StringReader(stylesheet))).load30();
 
-    //        // Create a serializer, with output to the standard output stream
-    //        Serializer serializer = processor.newSerializer();
-    //        serializer.OutputWriter = Console.Out;
+            // Create a serializer, with output to the standard output stream
+            Serializer serializer = processor.newSerializer();
+            serializer.setOutputStream(java.lang.System.@out);
 
-    //        // Transform the source XML and serialize the result document
-    //        transformer.applyTemplates(input, serializer);
-    //    }
-    //}
+            // Transform the source XML and serialize the result document
+            transformer.applyTemplates(input, serializer);
+        }
+    }
 
 
     /// <summary>
