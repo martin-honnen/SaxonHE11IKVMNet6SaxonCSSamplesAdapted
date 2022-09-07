@@ -49,8 +49,8 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 new XsltSimple2(),
                 new XsltSimple3(),
                 //new XsltStripSpace(),
-                //new XsltReuseExecutable(),
-                //new XsltReuseTransformer(),
+                new XsltReuseExecutable(),
+                new XsltReuseTransformer(),
                 //new XsltFilterChain(),
                 //new XsltDomToDom(),
                 //new XsltXdmToXdm(),
@@ -630,87 +630,87 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
     //}
 
 
-    ///// <summary>
-    ///// Run a transformation, compiling the stylesheet once (into an XsltExecutable) and using it to transform two 
-    ///// different source documents
-    ///// </summary>
+    /// <summary>
+    /// Run a transformation, compiling the stylesheet once (into an XsltExecutable) and using it to transform two 
+    /// different source documents
+    /// </summary>
 
-    //public class XsltReuseExecutable : Example
-    //{
+    public class XsltReuseExecutable : Example
+    {
 
-    //    public override string testName => "XsltReuseExecutable";
+        public override string testName => "XsltReuseExecutable";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
+        public override void run(URL samplesDir)
+        {
+            // Create a Processor instance.
+            Processor processor = new(false);
 
-    //        // Create a compiled stylesheet
-    //        XsltExecutable templates = processor.newXsltCompiler().compile(new Uri(samplesDir, "styles/summarize.xsl"));
+            // Create a compiled stylesheet
+            XsltExecutable templates = processor.newXsltCompiler().compile(new StreamSource(new URL(samplesDir, "styles/summarize.xsl").toURI().toASCIIString()));
 
-    //        // Note: we could actually use the same Xslt30Transformer in this case.
-    //        // But in principle, the two transformations could be done in parallel in separate threads.
+            // Note: we could actually use the same Xslt30Transformer in this case.
+            // But in principle, the two transformations could be done in parallel in separate threads.
 
-    //        const string sourceFile1 = "data/books.xml";
-    //        const string sourceFile2 = "data/othello.xml";
+            const string sourceFile1 = "data/books.xml";
+            const string sourceFile2 = "data/othello.xml";
 
-    //        // Do the first transformation
-    //        Console.WriteLine("\n\n----- transform of " + sourceFile1 + " -----");
-    //        Xslt30Transformer transformer1 = templates.load30();
-    //        XdmNode input1 = processor.newDocumentBuilder().Build(new Uri(samplesDir, sourceFile1));
-    //        transformer1.applyTemplates(input1, processor.newSerializer(Console.Out));     // default destination is Console.Out
+            // Do the first transformation
+            Console.WriteLine("\n\n----- transform of " + sourceFile1 + " -----");
+            Xslt30Transformer transformer1 = templates.load30();
+            XdmNode input1 = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, sourceFile1).toURI().toASCIIString()));
+            transformer1.applyTemplates(input1, processor.newSerializer(java.lang.System.@out));     // default destination is Console.Out
 
-    //        // Do the second transformation
-    //        Console.WriteLine("\n\n----- transform of " + sourceFile2 + " -----");
-    //        Xslt30Transformer transformer2 = templates.load30();
-    //        XdmNode input2 = processor.newDocumentBuilder().Build(new Uri(samplesDir, sourceFile2));
-    //        transformer2.applyTemplates(input2, processor.newSerializer(Console.Out));     // default destination is Console.Out
-    //    }
-    //}
+            // Do the second transformation
+            Console.WriteLine("\n\n----- transform of " + sourceFile2 + " -----");
+            Xslt30Transformer transformer2 = templates.load30();
+            XdmNode input2 = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, sourceFile2).toURI().toASCIIString()));
+            transformer2.applyTemplates(input2, processor.newSerializer(java.lang.System.@out));     // default destination is Console.Out
+        }
+    }
 
-    ///// <summary>
-    ///// Show that the Xslt30Transformer is serially reusable; run a transformation twice using the same stylesheet
-    ///// and the same stylesheet parameters, but with a different input document.
-    ///// </summary>
+    /// <summary>
+    /// Show that the Xslt30Transformer is serially reusable; run a transformation twice using the same stylesheet
+    /// and the same stylesheet parameters, but with a different input document.
+    /// </summary>
 
-    //public class XsltReuseTransformer : Example
-    //{
+    public class XsltReuseTransformer : Example
+    {
 
-    //    public override string testName => "XsltReuseTransformer";
+        public override string testName => "XsltReuseTransformer";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
+        public override void run(URL samplesDir)
+        {
+            // Create a Processor instance.
+            Processor processor = new(false);
 
-    //        // Compile the stylesheet
-    //        XsltExecutable exec = processor.newXsltCompiler().compile(new Uri(samplesDir, "styles/summarize.xsl"));
+            // Compile the stylesheet
+            XsltExecutable exec = processor.newXsltCompiler().compile(new StreamSource(new URL(samplesDir, "styles/summarize.xsl").toURI().toASCIIString()));
 
-    //        // Create a transformer 
-    //        Xslt30Transformer transformer = exec.load30();
+            // Create a transformer 
+            Xslt30Transformer transformer = exec.load30();
 
-    //        // Set the stylesheet parameters
-    //        Dictionary<QName, XdmValue> params1 = new Dictionary<QName, XdmValue>();
-    //        params1.Add(new QName("", "", "include-attributes"), new XdmAtomicValue(false));
-    //        transformer.SetStylesheetParameters(params1);
+            // Set the stylesheet parameters
+            var params1 = new java.util.HashMap();//Dictionary<QName, XdmValue> params1 = new Dictionary<QName, XdmValue>();
+            params1.put(new QName("", "", "include-attributes"), new XdmAtomicValue(false));
+            transformer.setStylesheetParameters(params1);
 
-    //        // Load the 1st source document, building a tree
-    //        XdmNode input1 = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/books.xml"));
+            // Load the 1st source document, building a tree
+            XdmNode input1 = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));
 
-    //        // Run the transformer once
-    //        XdmDestination results = new();
-    //        transformer.applyTemplates(input1, results);
-    //        Console.WriteLine("1: " + results.XdmNode.OuterXml);
+            // Run the transformer once
+            XdmDestination results = new();
+            transformer.applyTemplates(input1, results);
+            Console.WriteLine("1: " + results.getXdmNode());
 
-    //        // Load the 2nd source document, building a tree
-    //        XdmNode input2 = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/more-books.xml"));
+            // Load the 2nd source document, building a tree
+            XdmNode input2 = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/more-books.xml").toURI().toASCIIString()));
 
-    //        // Run the transformer again
-    //        results.Reset();
-    //        transformer.applyTemplates(input2, results);
-    //        Console.WriteLine("2: " + results.XdmNode.OuterXml);
-    //    }
-    //}
+            // Run the transformer again
+            results.reset();
+            transformer.applyTemplates(input2, results);
+            Console.WriteLine("2: " + results.getXdmNode());
+        }
+    }
 
     ///// <summary>
     ///// Run a sequence of transformations in a pipeline, each one acting as a filter
