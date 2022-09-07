@@ -14,6 +14,7 @@ using java.io;
 using Console = System.Console;
 using File = System.IO.File;
 using System.Reflection;
+using StringReader = java.io.StringReader;
 
 namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 {
@@ -63,7 +64,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 //new XsltCapturingMessages(),
                 new XsltProcessingInstruction(),
                 //new XsltShowingLineNumbers(),
-                //new XsltStreamDoc(),
+                new XsltStreamDoc(),
                 //new XsltMultipleOutput(),
                 //new XsltUsingResultHandler(),
                 //new XsltUsingIdFunction(),
@@ -78,10 +79,10 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 new XQueryToXdm(),
                 new XQueryCallFunction(),
                 //new XQueryFromXmlReader(),
-                //new XQueryToSerializedSequence(),
+                new XQueryToSerializedSequence(),
                 new XQueryUsingParameter(),
                 //new XQueryMultiModule(),
-                //new XQueryTryCatch(),
+                new XQueryTryCatch(),
                 //new XQueryExtensibility(),
                 //new XQueryUpdate(),
                 //new XQuerySchemaAware(),
@@ -1927,49 +1928,49 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     //}
 
-    ///// <summary>
-    ///// Show a query producing a sequence as its result and returning the sequence
-    ///// to the C# application in the form of an iterator. The sequence is then
-    ///// output by serializing each item individually, with each item on a new line.
-    ///// </summary>
+    /// <summary>
+    /// Show a query producing a sequence as its result and returning the sequence
+    /// to the C# application in the form of an iterator. The sequence is then
+    /// output by serializing each item individually, with each item on a new line.
+    /// </summary>
 
-    //public class XQueryToSerializedSequence : Example
-    //{
+    public class XQueryToSerializedSequence : Example
+    {
 
-    //    public override string testName => "XQueryToSerializedSequence";
+        public override string testName => "XQueryToSerializedSequence";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        Processor processor = new(false);
-    //        string inputFileName = new Uri(samplesDir, "data/books.xml").ToString();
-    //        XmlTextReader reader = new(inputFileName,
-    //            UriConnection.getReadableUriStream(new Uri(samplesDir, "data/books.xml")))
-    //        {
-    //            Normalization = true
-    //        };
+        public override void run(URL samplesDir)
+        {
+            Processor processor = new(false);
+            //string inputFileName = new Uri(samplesDir, "data/books.xml").ToString();
+            //XmlTextReader reader = new(inputFileName,
+            //    UriConnection.getReadableUriStream(new Uri(samplesDir, "data/books.xml")))
+            //{
+            //    Normalization = true
+            //};
 
-    //        // Add a validating reader - needed in case there are entity references
-    //        XmlReaderSettings settings = new()
-    //        {
-    //            ValidationType = ValidationType.DTD,
-    //            DtdProcessing = DtdProcessing.Parse
-    //        };
-    //        XmlReader validator = XmlReader.Create(reader, settings);  // TODO: NOT USED!!
+            //// Add a validating reader - needed in case there are entity references
+            //XmlReaderSettings settings = new()
+            //{
+            //    ValidationType = ValidationType.DTD,
+            //    DtdProcessing = DtdProcessing.Parse
+            //};
+            //XmlReader validator = XmlReader.Create(reader, settings);  // TODO: NOT USED!!
 
-    //        XdmNode doc = processor.newDocumentBuilder().Build(reader);
+            XdmNode doc = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));
 
-    //        XQueryCompiler compiler = processor.newXQueryCompiler();
-    //        XQueryExecutable exp = compiler.compile("//ISBN");
-    //        XQueryEvaluator eval = exp.Load();
-    //        eval.ContextItem = doc;
+            XQueryCompiler compiler = processor.newXQueryCompiler();
+            XQueryExecutable exp = compiler.compile("//ISBN");
+            XQueryEvaluator eval = exp.load();
+            eval.setContextItem(doc);
 
-    //        foreach (XdmNode node in eval)
-    //        {
-    //            Console.WriteLine(node.OuterXml);
-    //        }
-    //    }
+            foreach (XdmNode node in eval)
+            {
+                Console.WriteLine(node);
+            }
+        }
 
-    //}
+    }
 
     /// <summary>
     /// Show a query that takes a parameter (external variable) as input.
@@ -2037,29 +2038,29 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
     //    }
     //}
 
-    ///// <summary>
-    ///// Demonstrate using a try-catch expression in the query, a feature of XQuery 3.0
-    ///// </summary>
+    /// <summary>
+    /// Demonstrate using a try-catch expression in the query, a feature of XQuery 3.0
+    /// </summary>
 
-    //public class XQueryTryCatch : Example
-    //{
+    public class XQueryTryCatch : Example
+    {
 
-    //    public override string testName => "XQueryTryCatch";
+        public override string testName => "XQueryTryCatch";
 
-    //    public override void run(URL samplesDir)
-    //    {
+        public override void run(URL samplesDir)
+        {
 
-    //        const string query = "xquery version '3.1'; try {doc('book.xml')}catch * {\"XQuery 3.0 catch clause - file not found.\"}";
-    //        Processor processor = new(false);
+            const string query = "xquery version '3.1'; try {doc('book.xml')}catch * {\"XQuery 3.0 catch clause - file not found.\"}";
+            Processor processor = new(false);
 
-    //        XQueryCompiler compiler = processor.newXQueryCompiler();
-    //        XQueryExecutable exp = compiler.compile(query);
-    //        XQueryEvaluator eval = exp.Load();
-    //        Serializer qout = processor.newSerializer(Console.Out);
-    //        eval.Run(qout);
-    //    }
+            XQueryCompiler compiler = processor.newXQueryCompiler();
+            XQueryExecutable exp = compiler.compile(query);
+            XQueryEvaluator eval = exp.load();
+            Serializer qout = processor.newSerializer(java.lang.System.@out);
+            eval.run(qout);
+        }
 
-    //}
+    }
 
     ///// <summary>
     ///// Demonstrate XQuery extensibility using lambda-expression extensions
@@ -2275,41 +2276,41 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     //}
 
-    ///// <summary>
-    ///// Show XSLT streaming of document
-    ///// </summary>
+    /// <summary>
+    /// Show XSLT streaming of document: HE will just do normal processing and emit a warning about not streaming
+    /// </summary>
 
-    //public class XsltStreamDoc : Example
-    //{
+    public class XsltStreamDoc : Example
+    {
 
-    //    public override string testName => "XsltStreamDoc";
+        public override string testName => "XsltStreamDoc";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        Processor processor = new(true);
+        public override void run(URL samplesDir)
+        {
+            Processor processor = new(true);
 
-    //        // Create the stylesheet
-    //        string stylesheet = "<xsl:transform version='3.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>\n" +
-    //            " <xsl:template name='main'>\n" +
-    //            "  <xsl:source-document streamable='yes' href='" + new Uri(samplesDir, "data/othello.xml").ToString() + "'>\n" +
-    //            "   <xsl:value-of select=\"count(copy-of(//LINE)[count(tokenize(.)) &gt; 0] )\" />\n" +
-    //            "  </xsl:source-document>\n" +
-    //            " </xsl:template>\n" +
-    //            "</xsl:transform>";
+            // Create the stylesheet
+            string stylesheet = "<xsl:transform version='3.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>\n" +
+                " <xsl:template name='main'>\n" +
+                "  <xsl:source-document streamable='yes' href='" + new URL(samplesDir, "data/othello.xml").ToString() + "'>\n" +
+                "   <xsl:value-of select=\"count(copy-of(//LINE)[count(tokenize(.)) &gt; 0] )\" />\n" +
+                "  </xsl:source-document>\n" +
+                " </xsl:template>\n" +
+                "</xsl:transform>";
 
-    //        // Create a transformer for the stylesheet.
-    //        Xslt30Transformer transformer = processor.newXsltCompiler().compile(new StringReader(stylesheet)).load30();
+            // Create a transformer for the stylesheet.
+            Xslt30Transformer transformer = processor.newXsltCompiler().compile(new StreamSource(new StringReader(stylesheet))).load30();
 
-    //        // Create a serializer, with output to the standard output stream
-    //        Serializer serializer = processor.newSerializer();
-    //        serializer.OutputWriter = Console.Out;
-    //        //  serializer.SetOutputProperty(Serializer.INDENT, "yes");
+            // Create a serializer, with output to the standard output stream
+            Serializer serializer = processor.newSerializer();
+            serializer.setOutputStream(java.lang.System.@out);
+            //  serializer.SetOutputProperty(Serializer.INDENT, "yes");
 
-    //        // Transform the source XML, calling a named initial template, and serialize the result document.
-    //        transformer.CallTemplate(new QName("main"), serializer);
-    //    }
+            // Transform the source XML, calling a named initial template, and serialize the result document.
+            transformer.callTemplate(new QName("main"), serializer);
+        }
 
-    //}
+    }
 
     ///// <summary>
     ///// Show validation of an instance document against a schema, 
