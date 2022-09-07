@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SaxonHE11IKVMNet6SaxonCSSamplesAdapted": {
+      "commandName": "Project",
+      "commandLineArgs": "-ask:no"
+    }
+  }
+}
