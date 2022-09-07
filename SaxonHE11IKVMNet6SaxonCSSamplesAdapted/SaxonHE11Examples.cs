@@ -53,19 +53,19 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 //new XsltStripSpace(),
                 new XsltReuseExecutable(),
                 new XsltReuseTransformer(),
-                //new XsltFilterChain(),
+                new XsltFilterChain(),
                 //new XsltDomToDom(),
                 new XsltXdmToXdm(),
                 new XsltXdmElementToXdm(),
                 //new XsltUsingSourceResolver(),
                 //new XsltSettingOutputProperties(),
-                //new XsltDisplayingErrors(),
+                new XsltDisplayingErrors(),
                 //new XsltCapturingErrors(),
                 //new XsltCapturingMessages(),
                 new XsltProcessingInstruction(),
                 //new XsltShowingLineNumbers(),
                 new XsltStreamDoc(),
-                //new XsltMultipleOutput(),
+                new XsltMultipleOutput(),
                 //new XsltUsingResultHandler(),
                 //new XsltUsingIdFunction(),
                 //new XsltUsingCollectionFinder(),
@@ -714,49 +714,49 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
         }
     }
 
-    ///// <summary>
-    ///// Run a sequence of transformations in a pipeline, each one acting as a filter
-    ///// </summary>
+    /// <summary>
+    /// Run a sequence of transformations in a pipeline, each one acting as a filter
+    /// </summary>
 
-    //public class XsltFilterChain : Example
-    //{
+    public class XsltFilterChain : Example
+    {
 
-    //    public override string testName => "XsltFilterChain";
+        public override string testName => "XsltFilterChain";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
+        public override void run(URL samplesDir)
+        {
+            // Create a Processor instance.
+            Processor processor = new(false);
 
-    //        // Load the source document
-    //        XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/books.xml"));
+            // Load the source document
+            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));
 
-    //        // Create a compiler
-    //        XsltCompiler compiler = processor.newXsltCompiler();
+            // Create a compiler
+            XsltCompiler compiler = processor.newXsltCompiler();
 
-    //        // Compile all three stylesheets
-    //        Xslt30Transformer transformer1 = compiler.compile(new Uri(samplesDir, "styles/identity.xsl")).load30();
-    //        Xslt30Transformer transformer2 = compiler.compile(new Uri(samplesDir, "styles/books.xsl")).load30();
-    //        Xslt30Transformer transformer3 = compiler.compile(new Uri(samplesDir, "styles/summarize.xsl")).load30();
+            // Compile all three stylesheets
+            Xslt30Transformer transformer1 = compiler.compile(new StreamSource(new URL(samplesDir, "styles/identity.xsl").toURI().toASCIIString())).load30();
+            Xslt30Transformer transformer2 = compiler.compile(new StreamSource(new URL(samplesDir, "styles/books.xsl").toURI().toASCIIString())).load30();
+            Xslt30Transformer transformer3 = compiler.compile(new StreamSource(new URL(samplesDir, "styles/summarize.xsl").toURI().toASCIIString())).load30();
 
-    //        // Now run them in series
-    //        XdmDestination results1 = new();
-    //        transformer1.applyTemplates(input, results1);
-    //        //Console.WriteLine("After phase 1:");
-    //        //Console.WriteLine(results1.XdmNode.OuterXml);
+            // Now run them in series
+            XdmDestination results1 = new();
+            transformer1.applyTemplates(input, results1);
+            //Console.WriteLine("After phase 1:");
+            //Console.WriteLine(results1.XdmNode.OuterXml);
 
-    //        XdmDestination results2 = new();
-    //        transformer2.GlobalContextItem = results1.XdmNode;
-    //        transformer2.applyTemplates(results1.XdmNode, results2);
-    //        //Console.WriteLine("After phase 2:");
-    //        //Console.WriteLine(results2.XdmNode.OuterXml);
+            XdmDestination results2 = new();
+            transformer2.setGlobalContextItem(results1.getXdmNode());
+            transformer2.applyTemplates(results1.getXdmNode(), results2);
+            //Console.WriteLine("After phase 2:");
+            //Console.WriteLine(results2.XdmNode.OuterXml);
 
-    //        XdmDestination results3 = new();
-    //        transformer3.applyTemplates(results2.XdmNode, results3);
-    //        Console.WriteLine("After phase 3:");
-    //        Console.WriteLine(results3.XdmNode.OuterXml);
-    //    }
-    //}
+            XdmDestination results3 = new();
+            transformer3.applyTemplates(results2.getXdmNode(), results3);
+            Console.WriteLine("After phase 3:");
+            Console.WriteLine(results3.getXdmNode());
+        }
+    }
 
     /// <summary>
     /// Transform from an XDM tree to an XDM tree
@@ -1041,50 +1041,50 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
     //    }
     //}
 
-    ///// <summary>
-    ///// Run an XSLT transformation displaying compile-time errors to the console
-    ///// </summary>
+    /// <summary>
+    /// Run an XSLT transformation displaying compile-time errors to the console
+    /// </summary>
 
-    //public class XsltDisplayingErrors : Example
-    //{
+    public class XsltDisplayingErrors : Example
+    {
 
-    //    public override string testName => "XsltDisplayingErrors";
+        public override string testName => "XsltDisplayingErrors";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
+        public override void run(URL samplesDir)
+        {
+            // Create a Processor instance.
+            Processor processor = new(false);
 
-    //        // Create the XSLT Compiler
-    //        XsltCompiler compiler = processor.newXsltCompiler();
-
-
-    //        // Define a stylesheet containing errors
-    //        const string stylesheet = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='1.0'>\n" +
-    //                                  "<xsl:template name='eee:template'>\n" +
-    //                                  "  <xsl:value-of select='32'/>\n" +
-    //                                  "</xsl:template>\n" +
-    //                                  "<xsl:template name='main'>\n" +
-    //                                  "  <xsl:value-of select='$var'/>\n" +
-    //                                  "</xsl:template>\n" +
-    //                                  "</xsl:stylesheet>";
+            // Create the XSLT Compiler
+            XsltCompiler compiler = processor.newXsltCompiler();
 
 
-    //        // Attempt to compile the stylesheet and display the errors
-    //        try
-    //        {
-    //            compiler.BaseUri = new Uri("http://localhost/stylesheet");
-    //            compiler.compile(new XmlTextReader(new StringReader(stylesheet)));
-    //            Console.WriteLine("Stylesheet compilation succeeded");
-    //        }
-    //        catch (Exception)
-    //        {
-    //            Console.WriteLine("Stylesheet compilation failed");
-    //        }
+            // Define a stylesheet containing errors
+            const string stylesheet = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='1.0'>\n" +
+                                      "<xsl:template name='eee:template'>\n" +
+                                      "  <xsl:value-of select='32'/>\n" +
+                                      "</xsl:template>\n" +
+                                      "<xsl:template name='main'>\n" +
+                                      "  <xsl:value-of select='$var'/>\n" +
+                                      "</xsl:template>\n" +
+                                      "</xsl:stylesheet>";
 
 
-    //    }
-    //}
+            // Attempt to compile the stylesheet and display the errors
+            try
+            {
+                //compiler.setBaseURI(setBaseURI(new URI("http://localhost/stylesheet"));
+                compiler.compile(new StreamSource(new StringReader(stylesheet)));
+                Console.WriteLine("Stylesheet compilation succeeded");
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Stylesheet compilation failed");
+            }
+
+
+        }
+    }
 
     ///// <summary>
     ///// Run an XSLT transformation capturing compile-time errors within the application
@@ -1241,43 +1241,46 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     //}
 
-    ///// <summary>
-    ///// Run an XSLT transformation producing multiple output documents
-    ///// </summary>
+    /// <summary>
+    /// Run an XSLT transformation producing multiple output documents
+    /// </summary>
 
-    //public class XsltMultipleOutput : Example
-    //{
+    public class XsltMultipleOutput : Example
+    {
 
-    //    public override string testName => "XsltMultipleOutput";
+        public override string testName => "XsltMultipleOutput";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
-    //        processor.SetProperty(Saxon.Api.Feature.TIMING, true);
+        public override void run(URL samplesDir)
+        {
+            // Create a Processor instance.
+            Processor processor = new(false);
+            //processor.setProperty(Saxon.Api.Feature.TIMING, true);
+            processor.setConfigurationProperty(Feature.TIMING, "true");
 
-    //        // Load the source document
-    //        XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/othello.xml"));
+            // Load the source document
+            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/othello.xml").toURI().toASCIIString()));
 
-    //        // Create a transformer for the stylesheet.
-    //        Xslt30Transformer transformer = processor.newXsltCompiler().compile(new Uri(samplesDir, "styles/play.xsl")).load30();
+            // Create a transformer for the stylesheet.
+            Xslt30Transformer transformer = processor.newXsltCompiler().compile(new StreamSource(new URL(samplesDir, "styles/play.xsl").toURI().toASCIIString())).load30();
 
-    //        // Set the required stylesheet parameter
-    //        Dictionary<QName, XdmValue> parameters = new() {
-    //            {new QName("dir"), new XdmAtomicValue(samplesDir + "play")}
-    //        };
-    //        transformer.SetStylesheetParameters(parameters);
+            // Set the required stylesheet parameter
+            //Dictionary<QName, XdmValue> parameters = new() {
+            //    {new QName("dir"), new XdmAtomicValue(samplesDir + "play")}
+            //};
+            var parameters = new java.util.HashMap();
+            parameters.put(new QName("dir"), new XdmAtomicValue(samplesDir + "play"));
+            transformer.setStylesheetParameters(parameters);
 
-    //        // Create a serializer, with output to the standard output stream
-    //        Serializer serializer = processor.newSerializer();
-    //        serializer.OutputWriter = Console.Out;
+            // Create a serializer, with output to the standard output stream
+            Serializer serializer = processor.newSerializer();
+            serializer.setOutputStream(java.lang.System.@out);
 
-    //        // Transform the source XML and serialize the result document
-    //        transformer.applyTemplates(input, serializer);
+            // Transform the source XML and serialize the result document
+            transformer.applyTemplates(input, serializer);
 
-    //    }
+        }
 
-    //}
+    }
 
 
     ///// <summary>
