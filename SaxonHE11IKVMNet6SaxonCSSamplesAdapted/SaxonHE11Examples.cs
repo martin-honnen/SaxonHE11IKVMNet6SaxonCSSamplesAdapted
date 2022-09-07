@@ -7,6 +7,7 @@ using System.Net;
 using System.Xml;
 
 using URL = java.net.URL;
+using URI = java.net.URI;
 using javax.xml.transform.stream;
 using java.util;
 using java.io;
@@ -53,14 +54,14 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 new XsltReuseTransformer(),
                 //new XsltFilterChain(),
                 //new XsltDomToDom(),
-                //new XsltXdmToXdm(),
-                //new XsltXdmElementToXdm(),
+                new XsltXdmToXdm(),
+                new XsltXdmElementToXdm(),
                 //new XsltUsingSourceResolver(),
                 //new XsltSettingOutputProperties(),
                 //new XsltDisplayingErrors(),
                 //new XsltCapturingErrors(),
                 //new XsltCapturingMessages(),
-                //new XsltProcessingInstruction(),
+                new XsltProcessingInstruction(),
                 //new XsltShowingLineNumbers(),
                 //new XsltStreamDoc(),
                 //new XsltMultipleOutput(),
@@ -70,15 +71,15 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 //new XsltUsingDirectoryCollection(),
                 //new XsltIntegratedExtension(),
                 //new XsltSimpleExtension(),
-                //new XQueryToStream(),
-                //new XQueryToAtomicValue(),
-                //new XQueryToSequence(),
+                new XQueryToStream(),
+                new XQueryToAtomicValue(),
+                new XQueryToSequence(),
                 //new XQueryToDom(),
-                //new XQueryToXdm(),
-                //new XQueryCallFunction(),
+                new XQueryToXdm(),
+                new XQueryCallFunction(),
                 //new XQueryFromXmlReader(),
                 //new XQueryToSerializedSequence(),
-                //new XQueryUsingParameter(),
+                new XQueryUsingParameter(),
                 //new XQueryMultiModule(),
                 //new XQueryTryCatch(),
                 //new XQueryExtensibility(),
@@ -756,81 +757,81 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
     //    }
     //}
 
-    ///// <summary>
-    ///// Transform from an XDM tree to an XDM tree
-    ///// </summary>
+    /// <summary>
+    /// Transform from an XDM tree to an XDM tree
+    /// </summary>
 
-    //public class XsltXdmToXdm : Example
-    //{
+    public class XsltXdmToXdm : Example
+    {
 
-    //    public override string testName => "XsltXdmToXdm";
+        public override string testName => "XsltXdmToXdm";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
+        public override void run(URL samplesDir)
+        {
+            // Create a Processor instance.
+            Processor processor = new(false);
 
-    //        // Load the source document
-    //        XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/books.xml"));
+            // Load the source document
+            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));
 
-    //        // Create a compiler
-    //        XsltCompiler compiler = processor.newXsltCompiler();
+            // Create a compiler
+            XsltCompiler compiler = processor.newXsltCompiler();
 
-    //        // Compile the stylesheet
-    //        Xslt30Transformer transformer = compiler.compile(new Uri(samplesDir, "styles/summarize.xsl")).load30();
+            // Compile the stylesheet
+            Xslt30Transformer transformer = compiler.compile(new StreamSource(new URL(samplesDir, "styles/summarize.xsl").toURI().toASCIIString())).load30();
 
-    //        // Run the transformation
-    //        XdmDestination result = new();
-    //        transformer.applyTemplates(input, result);
+            // Run the transformation
+            XdmDestination result = new();
+            transformer.applyTemplates(input, result);
 
-    //        // Serialize the result so we can see that it worked
-    //        StringWriter sw = new();
-    //        result.XdmNode.WriteTo(new XmlTextWriter(sw));
-    //        Console.WriteLine(sw.ToString());
+            // Serialize the result so we can see that it worked
+            //StringWriter sw = new();
+            //result.getXdmNode().(new XmlTextWriter(sw));
+            Console.WriteLine(result.getXdmNode().toString());
 
-    //        // Note: we don't do 
-    //        //   result.XdmNode.WriteTo(new XmlTextWriter(Console.Out));
-    //        // because that results in the Console.out stream being closed, 
-    //        // with subsequent attempts to write to it being rejected.
-    //    }
-    //}
+            // Note: we don't do 
+            //   result.XdmNode.WriteTo(new XmlTextWriter(Console.Out));
+            // because that results in the Console.out stream being closed, 
+            // with subsequent attempts to write to it being rejected.
+        }
+    }
 
-    ///// <summary>
-    ///// Run an XSLT transformation from an XDM tree, starting at a node that is not the document node
-    ///// </summary>
+    /// <summary>
+    /// Run an XSLT transformation from an XDM tree, starting at a node that is not the document node
+    /// </summary>
 
-    //public class XsltXdmElementToXdm : Example
-    //{
+    public class XsltXdmElementToXdm : Example
+    {
 
-    //    public override string testName => "XsltXdmElementToXdm";
+        public override string testName => "XsltXdmElementToXdm";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
+        public override void run(URL samplesDir)
+        {
+            // Create a Processor instance.
+            Processor processor = new(false);
 
-    //        // Load the source document
-    //        XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/othello.xml"));
+            // Load the source document
+            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/othello.xml").toURI().toASCIIString()));
 
-    //        // Navigate to the first grandchild
-    //        XPathSelector eval = processor.newXPathCompiler().compile("/PLAY/FM[1]").Load();
-    //        eval.ContextItem = input;
-    //        input = (XdmNode)eval.evaluateSingle();
+            // Navigate to the first grandchild
+            XPathSelector eval = processor.newXPathCompiler().compile("/PLAY/FM[1]").load();
+            eval.setContextItem(input);
+            input = (XdmNode)eval.evaluateSingle();
 
-    //        // Create an XSLT compiler
-    //        XsltCompiler compiler = processor.newXsltCompiler();
+            // Create an XSLT compiler
+            XsltCompiler compiler = processor.newXsltCompiler();
 
-    //        // Compile the stylesheet
-    //        Xslt30Transformer transformer = compiler.compile(new Uri(samplesDir, "styles/summarize.xsl")).load30();
+            // Compile the stylesheet
+            Xslt30Transformer transformer = compiler.compile(new StreamSource(new URL(samplesDir, "styles/summarize.xsl").toURI().toASCIIString())).load30();
 
-    //        // Run the transformation
-    //        XdmDestination result = new();
-    //        transformer.applyTemplates(input, result);
+            // Run the transformation
+            XdmDestination result = new();
+            transformer.applyTemplates(input, result);
 
-    //        // Serialize the result so we can see that it worked
-    //        Console.WriteLine(result.XdmNode.OuterXml);
-    //    }
-    //}
+            // Serialize the result so we can see that it worked
+            Console.WriteLine(result.getXdmNode().toString());
+        }
+    }
 
     ///// <summary>
     ///// Run a transformation from a DOM (System.Xml.Document) input to a DOM output
@@ -867,86 +868,86 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
     //}
 
 
-    ///// <summary>
-    ///// Run a transformation driven by an xml-stylesheet processing instruction in the source document
-    ///// </summary>
+    /// <summary>
+    /// Run a transformation driven by an xml-stylesheet processing instruction in the source document
+    /// </summary>
 
-    //public class XsltProcessingInstruction : Example
-    //{
+    public class XsltProcessingInstruction : Example
+    {
 
-    //    public override string testName => "XsltProcessingInstruction";
+        public override string testName => "XsltProcessingInstruction";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
-    //        XsltExecutable exec;
+        public override void run(URL samplesDir)
+        {
+            // Create a Processor instance.
+            Processor processor = new(false);
+            XsltExecutable exec;
 
-    //        // Load the source document
-    //        XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/books.xml"));
-    //        //Console.WriteLine("=============== source document ===============");
-    //        //Console.WriteLine(input.OuterXml);
-    //        //Console.WriteLine("=========== end of source document ============");
+            // Load the source document
+            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));
+            //Console.WriteLine("=============== source document ===============");
+            //Console.WriteLine(input.OuterXml);
+            //Console.WriteLine("=========== end of source document ============");
 
-    //        // Navigate to the xml-stylesheet processing instruction having the pseudo-attribute type=text/xsl;
-    //        // then extract the value of the href pseudo-attribute if present
+            // Navigate to the xml-stylesheet processing instruction having the pseudo-attribute type=text/xsl;
+            // then extract the value of the href pseudo-attribute if present
 
-    //        const string path = @"/processing-instruction(xml-stylesheet)[matches(.,'type\s*=\s*[''""]text/xsl[''""]')]" +
-    //                            @"/replace(., '.*?href\s*=\s*[''""](.*?)[''""].*', '$1')";
+            const string path = @"/processing-instruction(xml-stylesheet)[matches(.,'type\s*=\s*[''""]text/xsl[''""]')]" +
+                                @"/replace(., '.*?href\s*=\s*[''""](.*?)[''""].*', '$1')";
 
-    //        XPathSelector eval = processor.newXPathCompiler().compile(path).Load();
-    //        eval.ContextItem = input;
-    //        XdmAtomicValue hrefval = (XdmAtomicValue)eval.evaluateSingle();
-    //        string href = hrefval?.ToString();
+            XPathSelector eval = processor.newXPathCompiler().compile(path).load();
+            eval.setContextItem(input);
+            XdmAtomicValue hrefval = (XdmAtomicValue)eval.evaluateSingle();
+            string href = hrefval?.toString();
 
-    //        if (string.IsNullOrEmpty(href))
-    //        {
-    //            Console.WriteLine("No suitable xml-stylesheet processing instruction found");
-    //            return;
+            if (string.IsNullOrEmpty(href))
+            {
+                Console.WriteLine("No suitable xml-stylesheet processing instruction found");
+                return;
 
-    //        }
-    //        else if (href[0] == '#')
-    //        {
+            }
+            else if (href[0] == '#')
+            {
 
-    //            // The stylesheet is embedded in the source document and identified by a URI of the form "#id"
+                // The stylesheet is embedded in the source document and identified by a URI of the form "#id"
 
-    //            Console.WriteLine("Locating embedded stylesheet with href = " + href);
-    //            string idpath = "id('" + href[1..] + "')";
-    //            eval = processor.newXPathCompiler().compile(idpath).Load();
-    //            eval.ContextItem = input;
-    //            XdmNode node = (XdmNode)eval.evaluateSingle();
-    //            if (node == null)
-    //            {
-    //                Console.WriteLine("No element found with ID " + href[1..]);
-    //                return;
-    //            }
-    //            exec = processor.newXsltCompiler().compile(node);
+                Console.WriteLine("Locating embedded stylesheet with href = " + href);
+                string idpath = "id('" + href[1..] + "')";
+                eval = processor.newXPathCompiler().compile(idpath).load();
+                eval.setContextItem(input);
+                XdmNode node = (XdmNode)eval.evaluateSingle();
+                if (node == null)
+                {
+                    Console.WriteLine("No element found with ID " + href[1..]);
+                    return;
+                }
+                exec = processor.newXsltCompiler().compile(node.asSource());
 
-    //        }
-    //        else
-    //        {
+            }
+            else
+            {
 
-    //            // The stylesheet is in an external document
+                // The stylesheet is in an external document
 
-    //            Console.WriteLine("Locating stylesheet at uri = " + new Uri(input.BaseUri, href));
+                Console.WriteLine("Locating stylesheet at uri = " + new URL(input.getBaseURI().toURL(), href));
 
-    //            // Fetch and compile the referenced stylesheet
-    //            exec = processor.newXsltCompiler().compile(new Uri(input.BaseUri, href));
-    //        }
+                // Fetch and compile the referenced stylesheet
+                exec = processor.newXsltCompiler().compile(new StreamSource(new URL(input.getBaseURI().toURL(), href).toURI().toASCIIString()));
+            }
 
-    //        // Create a transformer 
-    //        Xslt30Transformer transformer = exec.load30();
+            // Create a transformer 
+            Xslt30Transformer transformer = exec.load30();
 
-    //        // Set the root node of the source document to be the global context item
-    //        transformer.GlobalContextItem = input;
+            // Set the root node of the source document to be the global context item
+            transformer.setGlobalContextItem(input);
 
-    //        // Run it       
-    //        XdmDestination results = new();
-    //        transformer.applyTemplates(input, results);
-    //        Console.WriteLine(results.XdmNode.OuterXml);
+            // Run it       
+            XdmDestination results = new();
+            transformer.applyTemplates(input, results);
+            Console.WriteLine(results.getXdmNode());
 
-    //    }
-    //}
+        }
+    }
 
     ///// <summary>
     ///// Run an XSLT transformation setting serialization properties from the calling application
@@ -1715,83 +1716,84 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     //}
 
-    ///// <summary>
-    ///// Show a query producing a document as its result and serializing this to a FileStream
-    ///// </summary>
+    /// <summary>
+    /// Show a query producing a document as its result and serializing this to a FileStream
+    /// </summary>
 
-    //public class XQueryToStream : Example
-    //{
+    public class XQueryToStream : Example
+    {
 
-    //    public override string testName => "XQueryToStream";
+        public override string testName => "XQueryToStream";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        Processor processor = new(true);
-    //        XQueryCompiler compiler = processor.newXQueryCompiler();
-    //        compiler.BaseUri = samplesDir;
-    //        compiler.DeclareNamespace("saxon", "http://saxon.sf.net/");
-    //        XQueryExecutable exp = compiler.compile("<saxon:example>{static-base-uri()}</saxon:example>");
-    //        XQueryEvaluator eval = exp.Load();
-    //        Serializer qout = processor.newSerializer();
-    //        qout.SetOutputProperty(Serializer.METHOD, "xml");
-    //        qout.SetOutputProperty(Serializer.INDENT, "yes");
-    //        qout.SetOutputProperty(Serializer.SAXON_INDENT_SPACES, "1");
-    //        qout.OutputStream = new FileStream("testoutput.xml", FileMode.Create, FileAccess.Write);
-    //        Console.WriteLine("Output written to testoutput.xml");
-    //        eval.Run(qout);
-    //    }
+        public override void run(URL samplesDir)
+        {
+            Processor processor = new(true);
+            XQueryCompiler compiler = processor.newXQueryCompiler();
+            //compiler.setBaseUri(samplesDir;
+            compiler.setBaseURI(samplesDir.toURI());
+            compiler.declareNamespace("saxon", "http://saxon.sf.net/");
+            XQueryExecutable exp = compiler.compile("<saxon:example>{static-base-uri()}</saxon:example>");
+            XQueryEvaluator eval = exp.load();
+            Serializer qout = processor.newSerializer();
+            //qout.setOutputProperty(Serializer.METHOD, "xml");
+            //qout.setOutputProperty(Serializer.INDENT, "yes");
+            //qout.setOutputProperty(Serializer.SAXON_INDENT_SPACES, "1");
+            qout.setOutputStream(new FileOutputStream("testoutput.xml"));
+            Console.WriteLine("Output written to testoutput.xml");
+            eval.run(qout);
+        }
 
-    //}
+    }
 
-    ///// <summary>
-    ///// Show a query producing a single atomic value as its result and returning the value
-    ///// to the C# application
-    ///// </summary>
+    /// <summary>
+    /// Show a query producing a single atomic value as its result and returning the value
+    /// to the C# application
+    /// </summary>
 
-    //public class XQueryToAtomicValue : Example
-    //{
+    public class XQueryToAtomicValue : Example
+    {
 
-    //    public override string testName => "XQueryToAtomicValue";
+        public override string testName => "XQueryToAtomicValue";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        Processor processor = new(false);
-    //        XQueryCompiler compiler = processor.newXQueryCompiler();
-    //        XQueryExecutable exp = compiler.compile("avg(for $i in 1 to 10 return $i * $i)");
-    //        XQueryEvaluator eval = exp.Load();
-    //        XdmAtomicValue result = (XdmAtomicValue)eval.evaluateSingle();
-    //        Console.WriteLine("Result type: " + result.Value.GetType());
-    //        Console.WriteLine("Result value: " + (decimal)result.Value);
-    //    }
+        public override void run(URL samplesDir)
+        {
+            Processor processor = new(false);
+            XQueryCompiler compiler = processor.newXQueryCompiler();
+            XQueryExecutable exp = compiler.compile("avg(for $i in 1 to 10 return $i * $i)");
+            XQueryEvaluator eval = exp.load();
+            XdmAtomicValue result = (XdmAtomicValue)eval.evaluateSingle();
+            Console.WriteLine("Result type: " + result.getValue().GetType());
+            Console.WriteLine("Result value: " + result.getValue());
+        }
 
-    //}
+    }
 
-    ///// <summary>
-    ///// Show a query producing a sequence as its result and returning the sequence
-    ///// to the C# application in the form of an iterator. For each item in the
-    ///// result, its string value is output.
-    ///// </summary>
+    /// <summary>
+    /// Show a query producing a sequence as its result and returning the sequence
+    /// to the C# application in the form of an iterator. For each item in the
+    /// result, its string value is output.
+    /// </summary>
 
-    //public class XQueryToSequence : Example
-    //{
+    public class XQueryToSequence : Example
+    {
 
-    //    public override string testName => "XQueryToSequence";
+        public override string testName => "XQueryToSequence";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        Processor processor = new(false);
-    //        XQueryCompiler compiler = processor.newXQueryCompiler();
-    //        XQueryExecutable exp = compiler.compile("for $i in 1 to 10 return $i * $i");
-    //        XQueryEvaluator eval = exp.Load();
-    //        XdmValue value = eval.evaluate();
-    //        foreach (XdmItem item in value)
-    //        {
-    //            Console.WriteLine(item.ToString());
-    //        }
+        public override void run(URL samplesDir)
+        {
+            Processor processor = new(false);
+            XQueryCompiler compiler = processor.newXQueryCompiler();
+            XQueryExecutable exp = compiler.compile("for $i in 1 to 10 return $i * $i");
+            XQueryEvaluator eval = exp.load();
+            XdmValue value = eval.evaluate();
+            foreach (XdmItem item in value)
+            {
+                Console.WriteLine(item.ToString());
+            }
 
-    //    }
+        }
 
-    //}
+    }
 
     ///// <summary>
     ///// Show a query producing a DOM as its input and producing a DOM as its output
@@ -1822,68 +1824,68 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     //}
 
-    ///// <summary>
-    ///// Show a query producing a Saxon tree as its input and producing a Saxon tree as its output
-    ///// </summary>
+    /// <summary>
+    /// Show a query producing a Saxon tree as its input and producing a Saxon tree as its output
+    /// </summary>
 
-    //public class XQueryToXdm : Example
-    //{
+    public class XQueryToXdm : Example
+    {
 
-    //    public override string testName => "XQueryToXdm";
+        public override string testName => "XQueryToXdm";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        Processor processor = new(false);
+        public override void run(URL samplesDir)
+        {
+            Processor processor = new(false);
 
-    //        DocumentBuilder loader = processor.newDocumentBuilder();
-    //        loader.BaseUri = new Uri(samplesDir, "data/books.xml");
-    //        XdmNode indoc = loader.Build(loader.BaseUri);
+            DocumentBuilder loader = processor.newDocumentBuilder();
+            loader.setBaseURI(new URL(samplesDir, "data/books.xml").toURI());
+            XdmNode indoc = loader.build(new StreamSource(loader.getBaseURI().toASCIIString()));
 
-    //        XQueryCompiler compiler = processor.newXQueryCompiler();
-    //        XQueryExecutable exp = compiler.compile("<doc>{reverse(/*/*)}</doc>");
-    //        XQueryEvaluator eval = exp.Load();
-    //        eval.ContextItem = indoc;
-    //        XdmDestination qout = new();
-    //        eval.Run(qout);
-    //        XdmNode outdoc = qout.XdmNode;
-    //        Console.WriteLine(outdoc.OuterXml);
-    //    }
+            XQueryCompiler compiler = processor.newXQueryCompiler();
+            XQueryExecutable exp = compiler.compile("<doc>{reverse(/*/*)}</doc>");
+            XQueryEvaluator eval = exp.load();
+            eval.setContextItem(indoc);
+            XdmDestination qout = new();
+            eval.run(qout);
+            XdmNode outdoc = qout.getXdmNode();
+            Console.WriteLine(outdoc);
+        }
 
-    //}
+    }
 
-    ///// <summary>
-    ///// Show a query making a direct call to a user-defined function defined in the query
-    ///// </summary>
+    /// <summary>
+    /// Show a query making a direct call to a user-defined function defined in the query
+    /// </summary>
 
-    //public class XQueryCallFunction : Example
-    //{
+    public class XQueryCallFunction : Example
+    {
 
-    //    public override string testName => "XQueryCallFunction";
+        public override string testName => "XQueryCallFunction";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        Processor processor = new(false);
+        public override void run(URL samplesDir)
+        {
+            Processor processor = new(false);
 
-    //        XQueryCompiler qc = processor.newXQueryCompiler();
-    //        Uri uri = new(samplesDir, "data/books.xml");
-    //        XQueryExecutable exp1 = qc.compile("declare namespace f='f.ns';" +
-    //               "declare variable $z := 1 + xs:integer(doc-available('" + uri.ToString() + "'));" +
-    //               "declare variable $p as xs:integer external;" +
-    //               "declare function f:t1($v1 as xs:integer) { " +
-    //               "   $v1 div $z + $p" +
-    //               "};" +
-    //               "10");
-    //        XQueryEvaluator ev = exp1.Load();
-    //        ev.SetExternalVariable(new QName("", "p"), new XdmAtomicValue(39));
-    //        XdmValue v1 = new XdmAtomicValue(10);
-    //        XdmValue result = ev.CallFunction(new QName("f.ns", "f:t1"), new XdmValue[] { v1 });
-    //        Console.WriteLine("First result (expected 44): " + result.ToString());
-    //        v1 = new XdmAtomicValue(20);
-    //        result = ev.CallFunction(new QName("f.ns", "f:t1"), new XdmValue[] { v1 });
-    //        Console.WriteLine("Second result (expected 49): " + result.ToString());
-    //    }
+            XQueryCompiler qc = processor.newXQueryCompiler();
+            URL uri = new(samplesDir, "data/books.xml");
+            XQueryExecutable exp1 = qc.compile("declare namespace f='f.ns';" +
+                   "declare variable $z := 1 + xs:integer(doc-available('" + uri.ToString() + "'));" +
+                   "declare variable $p as xs:integer external;" +
+                   "declare function f:t1($v1 as xs:integer) { " +
+                   "   $v1 div $z + $p" +
+                   "};" +
+                   "10");
+            XQueryEvaluator ev = exp1.load();
+            ev.setExternalVariable(new QName("", "p"), new XdmAtomicValue(39));
+            XdmValue v1 = new XdmAtomicValue(10);
+            XdmValue result = ev.callFunction(new QName("f.ns", "f:t1"), new XdmValue[] { v1 });
+            Console.WriteLine("First result (expected 44): " + result.ToString());
+            v1 = new XdmAtomicValue(20);
+            result = ev.callFunction(new QName("f.ns", "f:t1"), new XdmValue[] { v1 });
+            Console.WriteLine("Second result (expected 49): " + result.ToString());
+        }
 
-    //}
+    }
 
     ///// <summary>
     ///// Show a query reading an input document using an XmlReader (the .NET XML parser)
@@ -1969,32 +1971,32 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     //}
 
-    ///// <summary>
-    ///// Show a query that takes a parameter (external variable) as input.
-    ///// The query produces a single atomic value as its result and returns the value
-    ///// to the C# application. 
-    ///// </summary>
+    /// <summary>
+    /// Show a query that takes a parameter (external variable) as input.
+    /// The query produces a single atomic value as its result and returns the value
+    /// to the C# application. 
+    /// </summary>
 
-    //public class XQueryUsingParameter : Example
-    //{
+    public class XQueryUsingParameter : Example
+    {
 
-    //    public override string testName => "XQueryUsingParameter";
+        public override string testName => "XQueryUsingParameter";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        Processor processor = new(false);
-    //        XQueryCompiler compiler = processor.newXQueryCompiler();
-    //        compiler.DeclareNamespace("p", "http://saxon.sf.net/ns/p");
-    //        XQueryExecutable exp = compiler.compile(
-    //                "declare variable $p:in as xs:integer external; $p:in * $p:in");
-    //        XQueryEvaluator eval = exp.Load();
-    //        eval.SetExternalVariable(new QName("http://saxon.sf.net/ns/p", "p:in"), new XdmAtomicValue(12));
-    //        XdmAtomicValue result = (XdmAtomicValue)eval.evaluateSingle();
-    //        Console.WriteLine("Result type: " + result.Value.GetType());
-    //        Console.WriteLine("Result value: " + (long)result.Value);
-    //    }
+        public override void run(URL samplesDir)
+        {
+            Processor processor = new(false);
+            XQueryCompiler compiler = processor.newXQueryCompiler();
+            compiler.declareNamespace("p", "http://saxon.sf.net/ns/p");
+            XQueryExecutable exp = compiler.compile(
+                    "declare variable $p:in as xs:integer external; $p:in * $p:in");
+            XQueryEvaluator eval = exp.load();
+            eval.setExternalVariable(new QName("http://saxon.sf.net/ns/p", "p:in"), new XdmAtomicValue(12));
+            XdmAtomicValue result = (XdmAtomicValue)eval.evaluateSingle();
+            Console.WriteLine("Result type: " + result.getValue().GetType());
+            Console.WriteLine("Result value: " + result.getValue());
+        }
 
-    //}
+    }
 
     ///// <summary>
     ///// Show a query consisting of two modules, using a QueryResolver to resolve
