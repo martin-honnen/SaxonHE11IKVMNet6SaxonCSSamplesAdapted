@@ -60,7 +60,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 new XsltXdmToXdm(),
                 new XsltXdmElementToXdm(),
                 //new XsltUsingSourceResolver(),
-                //new XsltSettingOutputProperties(),
+                new XsltSettingOutputProperties(),
                 new XsltDisplayingErrors(),
                 //new XsltCapturingErrors(),
                 //new XsltCapturingMessages(),
@@ -85,7 +85,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 new XQueryUsingParameter(),
                 //new XQueryMultiModule(),
                 new XQueryTryCatch(),
-                //new XQueryExtensibility(),
+                new XQueryExtensibility(),
                 //new XQueryUpdate(),
                 //new XQuerySchemaAware(),
                 //new XPathSchemaAware(),
@@ -952,37 +952,37 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
         }
     }
 
-    ///// <summary>
-    ///// Run an XSLT transformation setting serialization properties from the calling application
-    ///// </summary>
+    /// <summary>
+    /// Run an XSLT transformation setting serialization properties from the calling application
+    /// </summary>
 
-    //public class XsltSettingOutputProperties : Example
-    //{
+    public class XsltSettingOutputProperties : Example
+    {
 
-    //    public override string testName => "XsltSettingOutputProperties";
+        public override string testName => "XsltSettingOutputProperties";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
+        public override void run(URL samplesDir)
+        {
+            // Create a Processor instance.
+            Processor processor = new(false);
 
-    //        // Load the source document
-    //        XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/books.xml"));
+            // Load the source document
+            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));
 
-    //        // Create a transformer for the stylesheet.
-    //        Xslt30Transformer transformer = processor.newXsltCompiler().compile(new Uri(samplesDir, "styles/summarize.xsl")).load30();
+            // Create a transformer for the stylesheet.
+            Xslt30Transformer transformer = processor.newXsltCompiler().compile(new StreamSource(new URL(samplesDir, "styles/summarize.xsl").toURI().toASCIIString())).load30();
 
-    //        // Create a serializer, with output to the standard output stream
-    //        Serializer serializer = processor.newSerializer();
-    //        serializer.SetOutputProperty(Serializer.METHOD, "xml");
-    //        serializer.SetOutputProperty(Serializer.INDENT, "no");
-    //        serializer.OutputWriter = Console.Out;
+            // Create a serializer, with output to the standard output stream
+            Serializer serializer = processor.newSerializer();
+            serializer.setOutputProperty(Serializer.Property.METHOD, "xml");
+            serializer.setOutputProperty(Serializer.Property.INDENT, "no");
+            serializer.setOutputStream(java.lang.System.@out);// = Console.Out;
 
-    //        // Transform the source XML and serialize the result document
-    //        transformer.applyTemplates(input, serializer);
-    //    }
+            // Transform the source XML and serialize the result document
+            transformer.applyTemplates(input, serializer);
+        }
 
-    //}
+    }
 
     ///// <summary>
     ///// Run an XSLT transformation making use of an XmlResolver to resolve URIs at document build time, at stylesheet compile time 
@@ -2152,78 +2152,173 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     }
 
-    ///// <summary>
-    ///// Demonstrate XQuery extensibility using lambda-expression extensions
-    ///// </summary>
+    /// <summary>
+    /// Demonstrate XQuery extensibility using extensions; //lambda-expression extensions
+    /// </summary>
 
-    //public class XQueryExtensibility : Example
-    //{
+    public class XQueryExtensibility : Example
+    {
 
-    //    public override string testName => "XQueryExtensibility";
+        public override string testName => "XQueryExtensibility";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        const string query = "declare namespace ext = \"urn:sampleExtensions\";" +
-    //                             "<out>" +
-    //                             "  <addition>{ext:add(2,2)}</addition>" +
-    //                             "  <average>{ext:average((1,2,3,4,5,6))}</average>" +
-    //                             "  <language>{ext:hostLanguage()}</language>" +
-    //                             "</out>";
+        public override void run(URL samplesDir)
+        {
+            const string query = "declare namespace ext = \"urn:sampleExtensions\";" +
+                                 "<out>" +
+                                 "  <addition>{ext:add(2,2)}</addition>" +
+                                 "  <average>{ext:average((1,2,3,4,5,6))}</average>" +
+                                 "  <language>{ext:hostLanguage()}</language>" +
+                                 "</out>";
 
-    //        Processor processor = new(false);
-    //        processor.RegisterExtensionFunction(
-    //            new QName("urn:sampleExtensions", "add"),
-    //            processor.ParseItemType("function(xs:integer, xs:integer) as xs:integer"),
-    //            (args) => new XdmAtomicValue(((XdmAtomicValue)args[0][0]).AsLong() + ((XdmAtomicValue)args[1][0]).AsLong()));
-    //        processor.RegisterExtensionFunction(
-    //            new QName("urn:sampleExtensions", "average"),
-    //            processor.ParseItemType("function(xs:integer*) as xs:decimal"),
-    //            (args) => {
-    //                decimal total = 0;
-    //                foreach (var item in args[0])
-    //                {
-    //                    total += ((XdmAtomicValue)item).AsLong();
-    //                }
-    //                return new XdmAtomicValue((decimal)total / args[0].Count)
-    //                    ;
-    //            });
+            Processor processor = new(false);
 
-    //        processor.RegisterExtensionFunction(new HostLanguage());
-    //        XQueryCompiler compiler = processor.newXQueryCompiler();
-    //        XQueryExecutable exp = compiler.compile(query);
-    //        XQueryEvaluator eval = exp.Load();
-    //        Serializer qout = processor.newSerializer(Console.Out);
-    //        eval.Run(qout);
-    //    }
+            //processor.registerExtensionFunction(
+            //    new QName("urn:sampleExtensions", "add"),
+            //    processor.parseItemType("function(xs:integer, xs:integer) as xs:integer"),
+            //    (args) => new XdmAtomicValue(((XdmAtomicValue)args[0][0]).AsLong() + ((XdmAtomicValue)args[1][0]).AsLong()));
 
-    //    private class HostLanguage : ExtensionFunctionDefinition
-    //    {
-    //        // This extension function needs to use the full interface because it accesses the context
-    //        public override QName FunctionName => new("urn:sampleExtensions", "hostLanguage");
-    //        public override int MinimumNumberOfArguments => 0;
-    //        public override int MaximumNumberOfArguments => 0;
-    //        public override XdmSequenceType[] ArgumentTypes => Array.Empty<XdmSequenceType>();
-    //        public override XdmSequenceType ResultType(XdmSequenceType[] ArgumentTypes)
-    //        {
-    //            return new XdmSequenceType(XdmAtomicType.String, ' ');
-    //        }
+            processor.registerExtensionFunction(new AddFunction());
 
-    //        public override ExtensionFunctionCall MakeFunctionCall()
-    //        {
-    //            return new HostLanguageCall();
-    //        }
+            //processor.registerExtensionFunction(
+            //    new QName("urn:sampleExtensions", "average"),
+            //    processor.ParseItemType("function(xs:integer*) as xs:decimal"),
+            //    (args) =>
+            //    {
+            //        decimal total = 0;
+            //        foreach (var item in args[0])
+            //        {
+            //            total += ((XdmAtomicValue)item).AsLong();
+            //        }
+            //        return new XdmAtomicValue((decimal)total / args[0].Count)
+            //            ;
+            //    });
 
-    //        private class HostLanguageCall : ExtensionFunctionCall
-    //        {
-    //            public override XdmValue Call(XdmValue[] arguments, DynamicContext context)
-    //            {
-    //                return new XdmAtomicValue(context.Implementation.getController().getExecutable().getHostLanguage()
-    //                    .ToString());
-    //            }
-    //        }
-    //    }
+            processor.registerExtensionFunction(new AverageFunction());
 
-    //}
+            processor.registerExtensionFunction(new HostLanguage());
+            XQueryCompiler compiler = processor.newXQueryCompiler();
+            XQueryExecutable exp = compiler.compile(query);
+            XQueryEvaluator eval = exp.load();
+            Serializer qout = processor.newSerializer(java.lang.System.@out);
+            eval.run(qout);
+        }
+
+        private class AddFunction : ExtensionFunction
+        {
+            public XdmValue call(XdmValue[] args)
+            {
+                return new XdmAtomicValue((args[0].itemAt(0) as XdmAtomicValue).getLongValue() + (args[1].itemAt(0) as XdmAtomicValue).getLongValue());
+            }
+
+            public net.sf.saxon.s9api.SequenceType[] getArgumentTypes()
+            {
+                return new net.sf.saxon.s9api.SequenceType[] { 
+                    net.sf.saxon.s9api.SequenceType.makeSequenceType(net.sf.saxon.s9api.ItemType.INTEGER, OccurrenceIndicator.ONE),
+                    net.sf.saxon.s9api.SequenceType.makeSequenceType(net.sf.saxon.s9api.ItemType.INTEGER, OccurrenceIndicator.ONE)
+                };
+            }
+
+            public QName getName()
+            {
+                return new QName("urn:sampleExtensions", "add");
+            }
+
+            public net.sf.saxon.s9api.SequenceType getResultType()
+            {
+                return net.sf.saxon.s9api.SequenceType.makeSequenceType(net.sf.saxon.s9api.ItemType.INTEGER, OccurrenceIndicator.ONE);
+            }
+        }
+
+        private class AverageFunction : ExtensionFunction
+        {
+            public XdmValue call(XdmValue[] args)
+            {
+                decimal total = 0;
+                foreach (var item in args[0])
+                {
+                    total += ((XdmAtomicValue)item).getLongValue();
+                }
+                return new XdmAtomicValue(new BigDecimalValue((long)(total / args[0].size())));
+            }
+
+            public net.sf.saxon.s9api.SequenceType[] getArgumentTypes()
+            {
+                return new net.sf.saxon.s9api.SequenceType[] { 
+                    net.sf.saxon.s9api.SequenceType.makeSequenceType(net.sf.saxon.s9api.ItemType.INTEGER, OccurrenceIndicator.ZERO_OR_MORE)
+                };
+            }
+
+            public QName getName()
+            {
+                return new QName("urn:sampleExtensions", "average");
+            }
+
+            public net.sf.saxon.s9api.SequenceType getResultType()
+            {
+                return net.sf.saxon.s9api.SequenceType.makeSequenceType(net.sf.saxon.s9api.ItemType.DECIMAL, OccurrenceIndicator.ONE);
+            }
+        }
+        private class HostLanguage : ExtensionFunctionDefinition
+        {
+            public override int getMinimumNumberOfArguments()
+            {
+                return 0;
+            }
+
+            public override int getMaximumNumberOfArguments()
+            {
+                return 0;
+            }
+            public override net.sf.saxon.value.SequenceType[] getArgumentTypes()
+            {
+                return Array.Empty<net.sf.saxon.value.SequenceType>();
+            }
+
+            public override StructuredQName getFunctionQName()
+            {
+                return new QName("urn:sampleExtensions", "hostLanguage").getStructuredQName();
+            }
+
+            public override net.sf.saxon.value.SequenceType getResultType(net.sf.saxon.value.SequenceType[] starr)
+            {
+                return net.sf.saxon.value.SequenceType.SINGLE_STRING;
+            }
+
+            public override ExtensionFunctionCall makeCallExpression()
+            {
+                return new HostLanguageCall();
+            }
+
+            // This extension function needs to use the full interface because it accesses the context
+            //public override QName FunctionName => new("urn:sampleExtensions", "hostLanguage");
+            //public override int MinimumNumberOfArguments => 0;
+            //public override int MaximumNumberOfArguments => 0;
+            //public override XdmSequenceType[] ArgumentTypes => Array.Empty<XdmSequenceType>();
+            //public override XdmSequenceType ResultType(XdmSequenceType[] ArgumentTypes)
+            //{
+            //    return new XdmSequenceType(XdmAtomicType.String, ' ');
+            //}
+
+            //public override ExtensionFunctionCall MakeFunctionCall()
+            //{
+            //    return new HostLanguageCall();
+            //}
+
+            private class HostLanguageCall : ExtensionFunctionCall
+            {
+                //public override XdmValue Call(XdmValue[] arguments, DynamicContext context)
+                //{
+                //    return new XdmAtomicValue(context.Implementation.getController().getExecutable().getHostLanguage()
+                //        .ToString());
+                //}
+                public override Sequence call(XPathContext context, Sequence[] arguments)
+                {
+                    return new StringValue(context.getController().getExecutable().getHostLanguage().toString());
+                }
+            }
+        }
+
+    }
 
     ///// <summary>
     ///// Demonstrate XQuery Update
