@@ -62,7 +62,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 //new XsltUsingSourceResolver(),
                 new XsltSettingOutputProperties(),
                 new XsltDisplayingErrors(),
-                //new XsltCapturingErrors(),
+                new XsltCapturingErrors(),
                 //new XsltCapturingMessages(),
                 new XsltProcessingInstruction(),
                 //new XsltShowingLineNumbers(),
@@ -1088,56 +1088,66 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
         }
     }
 
-    ///// <summary>
-    ///// Run an XSLT transformation capturing compile-time errors within the application
-    ///// </summary>
+    /// <summary>
+    /// Run an XSLT transformation capturing compile-time errors within the application
+    /// </summary>
 
-    //public class XsltCapturingErrors : Example
-    //{
+    public class XsltCapturingErrors : Example
+    {
 
-    //    public override string testName => "XsltCapturingErrors";
+        public override string testName => "XsltCapturingErrors";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
+        public override void run(URL samplesDir)
+        {
+            // Create a Processor instance.
+            Processor processor = new(false);
 
-    //        // Create the XSLT Compiler
-    //        XsltCompiler compiler = processor.newXsltCompiler();
+            // Create the XSLT Compiler
+            XsltCompiler compiler = processor.newXsltCompiler();
 
-    //        // Create a list to hold the error information
-    //        List<Error> errorList = new();
-    //        compiler.ErrorReporter = error => errorList.Add(error);
+            // Create a list to hold the error information
+            //List<Error> errorList = new();
+            compiler.setErrorReporter(new SimpleErrorCollector());//= error => errorList.Add(error);
 
-    //        // Define a stylesheet containing errors
-    //        string stylesheet =
-    //            "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='1.0'>\n" +
-    //            "<xsl:template name='fff:template'>\n" +
-    //            "  <xsl:value-of select='32'/>\n" +
-    //            "</xsl:template>\n" +
-    //            "<xsl:template name='main'>\n" +
-    //            "  <xsl:value-of select='$var'/>\n" +
-    //            "</xsl:template>\n" +
-    //            "</xsl:stylesheet>";
+            // Define a stylesheet containing errors
+            string stylesheet =
+                "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='1.0'>\n" +
+                "<xsl:template name='fff:template'>\n" +
+                "  <xsl:value-of select='32'/>\n" +
+                "</xsl:template>\n" +
+                "<xsl:template name='main'>\n" +
+                "  <xsl:value-of select='$var'/>\n" +
+                "</xsl:template>\n" +
+                "</xsl:stylesheet>";
 
 
-    //        // Attempt to compile the stylesheet and display the errors
-    //        try
-    //        {
-    //            compiler.BaseUri = new Uri("http://localhost/stylesheet");
-    //            compiler.compile(new StringReader(stylesheet));
-    //            Console.WriteLine("Stylesheet compilation succeeded");
-    //        }
-    //        catch (Exception)
-    //        {
-    //            Console.WriteLine("Stylesheet compilation failed with " + errorList.Count + " errors");
-    //            foreach (Error error in errorList)
-    //            {
-    //                Console.WriteLine("At line " + error.Location.LineNumber + ": " + error.Message);
-    //            }
-    //        }
-    //    }
-    //}
+            // Attempt to compile the stylesheet and display the errors
+            try
+            {
+                //compiler.BaseUri = new Uri("http://localhost/stylesheet");
+                compiler.compile(new StreamSource(new StringReader(stylesheet)));
+                Console.WriteLine("Stylesheet compilation succeeded");
+            }
+            catch (Exception)
+            {
+                var errorList = (compiler.getErrorReporter() as SimpleErrorCollector).ErrorList;
+                Console.WriteLine("Stylesheet compilation failed with " + errorList.Count + " errors");
+                foreach (var error in errorList)
+                {
+                    Console.WriteLine("At line " + error.getLocation().getLineNumber() + ": " + error.getMessage());
+                }
+            }
+        }
+
+        internal class SimpleErrorCollector : ErrorReporter
+        {            
+            public List<XmlProcessingError> ErrorList { get; private set; } = new List<XmlProcessingError>();
+            public void report(XmlProcessingError xpe)
+            {
+                ErrorList.Add(xpe);
+            }
+        }
+    }
 
     ///// <summary>
     ///// Run an XSLT transformation capturing run-time messages within the application
