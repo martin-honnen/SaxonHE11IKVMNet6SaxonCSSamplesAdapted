@@ -67,7 +67,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 new XsltStreamDoc(),
                 new XsltMultipleOutput(),
                 //new XsltUsingResultHandler(),
-                //new XsltUsingIdFunction(),
+                new XsltUsingIdFunction(),
                 //new XsltUsingCollectionFinder(),
                 //new XsltUsingDirectoryCollection(),
                 //new XsltIntegratedExtension(),
@@ -1283,62 +1283,62 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
     }
 
 
-    ///// <summary>
-    ///// Run an XSLT transformation using the id() function, with DTD validation
-    ///// </summary>
+    /// <summary>
+    /// Run an XSLT transformation using the id() function, with DTD validation, using xml:id
+    /// </summary>
 
-    //public class XsltUsingIdFunction : Example
-    //{
+    public class XsltUsingIdFunction : Example
+    {
 
-    //    public override string testName => "XsltUsingIdFunction";
+        public override string testName => "XsltUsingIdFunction";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        // Create a Processor instance
-    //        Processor processor = new Processor();
+        public override void run(URL samplesDir)
+        {
+            // Create a Processor instance
+            Processor processor = new (false);
 
-    //        // Load the source document. The Microsoft .NET parser does not report attributes of type ID. The only
-    //        // way to use the function is therefore (a) to use a different parser, or (b) to use xml:id. We
-    //        // choose the latter course.
+            // Load the source document. The Microsoft .NET parser does not report attributes of type ID. The only
+            // way to use the function is therefore (a) to use a different parser, or (b) to use xml:id. We
+            // choose the latter course.
 
-    //        const string doc = "<!DOCTYPE table [" +
-    //                           "<!ELEMENT table (row*)>" +
-    //                           "<!ELEMENT row EMPTY>" +
-    //                           "<!ATTLIST row xml:id ID #REQUIRED>" +
-    //                           "<!ATTLIST row value CDATA #REQUIRED>]>" +
-    //                           "<table><row xml:id='A123' value='green'/><row xml:id='Z789' value='blue'/></table>";
+            const string doc = "<!DOCTYPE table [" +
+                               "<!ELEMENT table (row*)>" +
+                               "<!ELEMENT row EMPTY>" +
+                               "<!ATTLIST row xml:id ID #REQUIRED>" +
+                               "<!ATTLIST row value CDATA #REQUIRED>]>" +
+                               "<table><row xml:id='A123' value='green'/><row xml:id='Z789' value='blue'/></table>";
 
-    //        DocumentBuilder builder = processor.newDocumentBuilder();
-    //        builder.DtdValidation = true;
-    //        builder.BaseUri = samplesDir;
-    //        XdmNode input = builder.Build(new StringReader(doc));
+            DocumentBuilder builder = processor.newDocumentBuilder();
+            builder.setDTDValidation(true);
+            builder.setBaseURI(samplesDir.toURI());
+            XdmNode input = builder.build(new StreamSource(new StringReader(doc)));
 
-    //        // Define a stylesheet that uses the id() function
-    //        const string stylesheet = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='2.0'>\n" +
-    //                                  "<xsl:template match='/'>\n" +
-    //                                  "  <xsl:copy-of select=\"id('Z789')\"/>\n" +
-    //                                  "</xsl:template>\n" +
-    //                                  "</xsl:stylesheet>";
+            // Define a stylesheet that uses the id() function
+            const string stylesheet = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='3.0'>\n" +
+                                      "<xsl:template match='/'>\n" +
+                                      "  <xsl:copy-of select=\"id('Z789')\"/>\n" +
+                                      "</xsl:template>\n" +
+                                      "</xsl:stylesheet>";
 
-    //        XsltCompiler compiler = processor.newXsltCompiler();
-    //        compiler.BaseUri = new Uri("http://localhost/stylesheet");
-    //        XsltExecutable exec = compiler.compile(new StringReader(stylesheet));
+            XsltCompiler compiler = processor.newXsltCompiler();
+            //compiler.BaseUri = new Uri("http://localhost/stylesheet");
+            XsltExecutable exec = compiler.compile(new StreamSource(new StringReader(stylesheet)));
 
-    //        // Create a transformer for the stylesheet
-    //        Xslt30Transformer transformer = exec.load30();
+            // Create a transformer for the stylesheet
+            Xslt30Transformer transformer = exec.load30();
 
-    //        // Set the destination
-    //        XdmDestination results = new();
+            // Set the destination
+            XdmDestination results = new();
 
-    //        // Transform the XML
-    //        transformer.applyTemplates(input, results);
+            // Transform the XML
+            transformer.applyTemplates(input, results);
 
-    //        // Show the result
-    //        Console.WriteLine(results.XdmNode.ToString());
+            // Show the result
+            Console.WriteLine(results.getXdmNode());
 
-    //    }
+        }
 
-    //}
+    }
 
     ///// <summary>
     ///// Show a transformation using a user-written result document handler. This example
