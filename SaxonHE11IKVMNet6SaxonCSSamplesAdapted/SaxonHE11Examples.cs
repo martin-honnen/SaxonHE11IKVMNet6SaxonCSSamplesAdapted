@@ -73,7 +73,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 //new XsltUsingResultHandler(),
                 new XsltUsingIdFunction(),
                 //new XsltUsingCollectionFinder(),
-                //new XsltUsingDirectoryCollection(),
+                new XsltUsingDirectoryCollection(),
                 new XsltIntegratedExtension(),
                 new XsltSimpleExtension(),
                 new XQueryToStream(),
@@ -1509,52 +1509,52 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
     //    }
     //}
 
-    ///// <summary>
-    ///// Show a transformation using a collection that maps to a directory
-    ///// </summary>
+    /// <summary>
+    /// Show a transformation using a collection that maps to a directory
+    /// </summary>
 
-    //public class XsltUsingDirectoryCollection : Example
-    //{
+    public class XsltUsingDirectoryCollection : Example
+    {
 
-    //    public override string testName => "XsltUsingDirectoryCollection";
+        public override string testName => "XsltUsingDirectoryCollection";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
+        public override void run(URL samplesDir)
+        {
+            // Create a Processor instance.
+            Processor processor = new(false);
 
-    //        // Define a stylesheet that uses the collection() function
-    //        string stylesheet =
-    //            "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='2.0'>\n" +
-    //            "<xsl:template name='main'>\n" +
-    //            " <out>\n" +
-    //            "  <xsl:for-each select=\"collection('" + samplesDir + "?recurse=yes;select=*.xml;on-error=warning')\">\n" +
-    //            "    <document uri='{document-uri(.)}' nodes='{count(//*)}'/>\n" +
-    //            "  </xsl:for-each><zzz/>\n" +
-    //            " </out>\n" +
-    //            "</xsl:template>\n" +
-    //            "</xsl:stylesheet>";
+            // Define a stylesheet that uses the collection() function
+            string stylesheet =
+                "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='3.0'>\n" +
+                "<xsl:template name='xsl:initial-template'>\n" +
+                " <out>\n" +
+                "  <xsl:for-each select=\"collection('" + samplesDir + "?recurse=yes;select=*.xml;on-error=warning')\">\n" +
+                "    <document uri='{base-uri(.)}' nodes='{count(//*)}'/>\n" +
+                "  </xsl:for-each><zzz/>\n" +
+                " </out>\n" +
+                "</xsl:template>\n" +
+                "</xsl:stylesheet>";
 
 
-    //        XsltCompiler compiler = processor.newXsltCompiler();
-    //        compiler.BaseUri = new Uri("http://localhost/stylesheet");
-    //        XsltExecutable exec = compiler.compile(new StringReader(stylesheet));
+            XsltCompiler compiler = processor.newXsltCompiler();
+            //compiler.BaseUri = new Uri("http://localhost/stylesheet");
+            XsltExecutable exec = compiler.compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
 
-    //        // Create a transformer for the stylesheet.
-    //        Xslt30Transformer transformer = exec.load30();
+            // Create a transformer for the stylesheet.
+            Xslt30Transformer transformer = exec.load30();
 
-    //        // Set the destination
-    //        XdmDestination results = new();
+            // Set the destination
+            XdmDestination results = new();
 
-    //        // Transform the XML, calling a named initial template
-    //        transformer.CallTemplate(new QName("main"), results);
+            // Transform the XML, calling the initial template
+            transformer.callTemplate(null, results);
 
-    //        // Show the result
-    //        Console.WriteLine(results.XdmNode.ToString());
+            // Show the result
+            Console.WriteLine(results.getXdmNode());
 
-    //    }
+        }
 
-    //}
+    }
 
 
     /// <summary>
