@@ -18,6 +18,7 @@ using StringReader = java.io.StringReader;
 using net.sf.saxon.om;
 using net.sf.saxon.value;
 using sun.font;
+using javax.xml.transform;
 
 namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 {
@@ -64,7 +65,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 new XsltSettingOutputProperties(),
                 new XsltDisplayingErrors(),
                 new XsltCapturingErrors(),
-                //new XsltCapturingMessages(),
+                new XsltCapturingMessages(),
                 new XsltProcessingInstruction(),
                 //new XsltShowingLineNumbers(),
                 new XsltStreamDoc(),
@@ -1150,57 +1151,70 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
         }
     }
 
-    ///// <summary>
-    ///// Run an XSLT transformation capturing run-time messages within the application
-    ///// </summary>
+    /// <summary>
+    /// Run an XSLT transformation capturing run-time messages within the application
+    /// </summary>
 
-    //public class XsltCapturingMessages : Example
-    //{
+    public class XsltCapturingMessages : Example
+    {
 
-    //    public override string testName => "XsltCapturingMessages";
+        public override string testName => "XsltCapturingMessages";
 
-    //    public override void run(URL samplesDir)
-    //    {
+        public override void run(URL samplesDir)
+        {
 
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
+            // Create a Processor instance.
+            Processor processor = new(false);
 
-    //        // Create the XSLT Compiler
-    //        XsltCompiler compiler = processor.newXsltCompiler();
+            // Create the XSLT Compiler
+            XsltCompiler compiler = processor.newXsltCompiler();
 
-    //        // Define a stylesheet that generates messages
-    //        const string stylesheet = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='2.0'>\n" +
-    //                                  "<xsl:template name='main'>\n" +
-    //                                  "  <xsl:message><a>starting</a></xsl:message>\n" +
-    //                                  "  <out><xsl:value-of select='current-date()'/></out>\n" +
-    //                                  "  <xsl:message><a>finishing</a></xsl:message>\n" +
-    //                                  "</xsl:template>\n" +
-    //                                  "</xsl:stylesheet>";
+            // Define a stylesheet that generates messages
+            const string stylesheet = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='3.0'>\n" +
+                                      "<xsl:template name='xsl:initial-template'>\n" +
+                                      "  <xsl:message><a>starting</a></xsl:message>\n" +
+                                      "  <out><xsl:value-of select='current-date()'/></out>\n" +
+                                      "  <xsl:message><a>finishing</a></xsl:message>\n" +
+                                      "</xsl:template>\n" +
+                                      "</xsl:stylesheet>";
 
-    //        compiler.BaseUri = new Uri("http://localhost/stylesheet");
-    //        XsltExecutable exec = compiler.compile(new StringReader(stylesheet));
+            //compiler.BaseUri = new Uri("http://localhost/stylesheet");
+            XsltExecutable exec = compiler.compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
 
 
-    //        // Create a transformer for the stylesheet.
-    //        Xslt30Transformer transformer = exec.load30();
+            // Create a transformer for the stylesheet.
+            Xslt30Transformer transformer = exec.load30();
 
-    //        // Create a Listener to which messages will be written
-    //        transformer.MessageListener = message => {
-    //            Console.Out.WriteLine("MESSAGE terminate=" + (message.Terminate ? "yes" : "no") + " at " + DateTime.Now);
-    //            Console.Out.WriteLine("From instruction at line " + message.Location.LineNumber +
-    //                                  " of " + message.Location.SystemId);
-    //            Console.Out.WriteLine(">>" + message.Content.StringValue);
-    //        };
+            // Create a Listener to which messages will be written
+            //transformer.MessageListener = message =>
+            //{
+            //    Console.Out.WriteLine("MESSAGE terminate=" + (message.Terminate ? "yes" : "no") + " at " + DateTime.Now);
+            //    Console.Out.WriteLine("From instruction at line " + message.Location.LineNumber +
+            //                          " of " + message.Location.SystemId);
+            //    Console.Out.WriteLine(">>" + message.Content.StringValue);
+            //};
 
-    //        // Create a serializer, with output to the standard output stream
-    //        Serializer serializer = processor.newSerializer();
-    //        serializer.OutputWriter = Console.Out;
+            transformer.setMessageListener(new SimpleMessageListener());
 
-    //        // Transform the source XML, calling a named initial template, and serialize the result document
-    //        transformer.CallTemplate(new QName("", "main"), serializer);
-    //    }
+            // Create a serializer, with output to the standard output stream
+            Serializer serializer = processor.newSerializer();
+            serializer.setOutputStream(java.lang.System.@out);
 
-    //}
+            // Transform the source XML, calling the initial template, and serialize the result document
+            transformer.callTemplate(null, serializer);
+        }
+
+        internal class SimpleMessageListener : MessageListener2
+        {
+            public void message(XdmNode content, QName errorCode, bool terminate, SourceLocator sl)
+            {
+                Console.Out.WriteLine($"MESSAGE terminate={(terminate ? "yes" : "no")} at {DateTime.Now}");
+                Console.Out.WriteLine($"From instruction at line {sl.getLineNumber()} of {sl.getSystemId()}");
+                Console.Out.WriteLine($">>{content.getStringValue()}");
+            }
+        }
+
+    }
 
 
     ///// <summary>
