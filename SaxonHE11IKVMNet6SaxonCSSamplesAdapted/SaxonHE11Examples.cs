@@ -73,7 +73,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 //new XsltUsingCollectionFinder(),
                 //new XsltUsingDirectoryCollection(),
                 new XsltIntegratedExtension(),
-                //new XsltSimpleExtension(),
+                new XsltSimpleExtension(),
                 new XQueryToStream(),
                 new XQueryToAtomicValue(),
                 new XQueryToSequence(),
@@ -1760,52 +1760,78 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
         //}
     }
 
-    ///// <summary>
-    ///// Show a transformation using calls to an extension function implemented using a lambda expression
-    ///// </summary>
+    /// <summary>
+    /// Show a transformation using calls to an extension function implementing ExtensionFunction //implemented using a lambda expression
+    /// </summary>
 
-    //public class XsltSimpleExtension : Example
-    //{
+    public class XsltSimpleExtension : Example
+    {
 
-    //    public override string testName => "XsltSimpleExtension";
+        public override string testName => "XsltSimpleExtension";
 
-    //    public override void run(URL samplesDir)
-    //    {
+        public override void run(URL samplesDir)
+        {
 
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
+            // Create a Processor instance.
+            Processor processor = new(false);
 
-    //        // Identify the Processor version
-    //        Console.WriteLine(processor.ProductVersion);
+            // Identify the Processor version
+            Console.WriteLine(processor.getSaxonProductVersion());
 
-    //        // Create the stylesheet
-    //        const string stylesheet = @"<xsl:transform version='2.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'" +
-    //                                  @"    xmlns:math='http://example.math.co.uk/demo'> " +
-    //                                  @" <xsl:template name='go'> " +
-    //                                  @"   <out sqrt2='{math:sqrtSimple(2.0e0)}' " +
-    //                                  @"        sqrtEmpty='{math:sqrtSimple(())}'/> " +
-    //                                  @" </xsl:template>" +
-    //                                  @" </xsl:transform>";
+            // Create the stylesheet
+            const string stylesheet = @"<xsl:transform version='3.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'" +
+                                      @"    xmlns:math='http://example.math.co.uk/demo'> " +
+                                      @" <xsl:template name='xsl:initial-template'> " +
+                                      @"   <out sqrt2='{math:sqrtSimple(2.0e0)}' " +
+                                      @"        sqrtEmpty='{math:sqrtSimple(())}'/> " +
+                                      @" </xsl:template>" +
+                                      @" </xsl:transform>";
 
-    //        // Register the extension function math:sqrtSimple
-    //        processor.RegisterExtensionFunction(
-    //            new QName("http://example.math.co.uk/demo", "sqrtSimple"),
-    //            processor.ParseItemType("function(xs:double?) as xs:double?"),
-    //            arg => arg[0].Empty ? XdmEmptySequence.Instance : new XdmAtomicValue(Math.Sqrt(((XdmAtomicValue)arg[0]).AsDouble())));
+            // Register the extension function math:sqrtSimple
+            processor.registerExtensionFunction(new SqrtFunction());
 
-    //        // Create a transformer for the stylesheet.
-    //        Xslt30Transformer transformer = processor.newXsltCompiler().compile(new StringReader(stylesheet)).load30();
+                //new QName("http://example.math.co.uk/demo", "sqrtSimple"),
+                //processor.ParseItemType("function(xs:double?) as xs:double?"),
+                //arg => arg[0].Empty ? XdmEmptySequence.Instance : new XdmAtomicValue(Math.Sqrt(((XdmAtomicValue)arg[0]).AsDouble())));
 
-    //        // Create a serializer, with output to the standard output stream
-    //        Serializer serializer = processor.newSerializer();
-    //        serializer.OutputWriter = Console.Out;
-    //        serializer.SetOutputProperty(Serializer.INDENT, "yes");
+            // Create a transformer for the stylesheet.
+            Xslt30Transformer transformer = processor.newXsltCompiler().compile(new StreamSource(new StringReader(stylesheet))).load30();
 
-    //        // Transform the source XML, calling a named initial template, and serialize the result document
-    //        transformer.CallTemplate(new QName("go"), serializer);
-    //    }
+            // Create a serializer, with output to the standard output stream
+            Serializer serializer = processor.newSerializer();
+            serializer.setOutputStream(java.lang.System.@out);
+            serializer.setOutputProperty(Serializer.Property.INDENT, "yes");
 
-    //}
+            // Transform the source XML, calling a named initial template, and serialize the result document
+            transformer.callTemplate(null, serializer);
+        }
+
+        private class SqrtFunction : ExtensionFunction
+        {
+            public XdmValue call(XdmValue[] arg)
+            {
+                return arg[0].isEmpty() ? XdmEmptySequence.getInstance() : new XdmAtomicValue(Math.Sqrt(((XdmAtomicValue)arg[0]).getDoubleValue()));
+            }
+
+            public net.sf.saxon.s9api.SequenceType[] getArgumentTypes()
+            {
+                return new net.sf.saxon.s9api.SequenceType[]
+                {
+                    net.sf.saxon.s9api.SequenceType.makeSequenceType(net.sf.saxon.s9api.ItemType.DOUBLE, OccurrenceIndicator.ZERO_OR_ONE)
+                };
+            }
+
+            public QName getName()
+            {
+                return new QName("http://example.math.co.uk/demo", "sqrtSimple");
+            }
+
+            public net.sf.saxon.s9api.SequenceType getResultType()
+            {
+                return net.sf.saxon.s9api.SequenceType.makeSequenceType(net.sf.saxon.s9api.ItemType.DOUBLE, OccurrenceIndicator.ZERO_OR_ONE);
+            }
+        }
+    }
 
     /// <summary>
     /// Show a query producing a document as its result and serializing this to a FileStream
