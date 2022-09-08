@@ -15,6 +15,8 @@ using Console = System.Console;
 using File = System.IO.File;
 using System.Reflection;
 using StringReader = java.io.StringReader;
+using net.sf.saxon.om;
+using net.sf.saxon.value;
 
 namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 {
@@ -70,7 +72,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 new XsltUsingIdFunction(),
                 //new XsltUsingCollectionFinder(),
                 //new XsltUsingDirectoryCollection(),
-                //new XsltIntegratedExtension(),
+                new XsltIntegratedExtension(),
                 //new XsltSimpleExtension(),
                 new XQueryToStream(),
                 new XQueryToAtomicValue(),
@@ -1530,148 +1532,233 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
     //}
 
 
-    ///// <summary>
-    ///// Show a transformation using calls to integrated extension functions (full API)
-    ///// </summary>
+    /// <summary>
+    /// Show a transformation using calls to integrated extension functions (full API)
+    /// </summary>
 
-    //public class XsltIntegratedExtension : Example
-    //{
+    public class XsltIntegratedExtension : Example
+    {
 
-    //    public override string testName => "XsltIntegratedExtension";
+        public override string testName => "XsltIntegratedExtension";
 
-    //    public override void run(URL samplesDir)
-    //    {
+        public override void run(URL samplesDir)
+        {
 
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
+            // Create a Processor instance.
+            Processor processor = new(false);
 
-    //        // Identify the Processor version
-    //        Console.WriteLine(processor.ProductVersion);
+            // Identify the Processor version
+            Console.WriteLine(processor.getSaxonProductVersion());
 
-    //        // Create the stylesheet
-    //        const string stylesheet = @"<xsl:transform version='2.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'" +
-    //                                  @"      xmlns:math='http://example.math.co.uk/demo' " +
-    //                                  @"      xmlns:env='http://example.env.co.uk/demo' " +
-    //                                  @"      exclude-result-prefixes='math env'> " +
-    //                                  @" <xsl:template name='go'> " +
-    //                                  @" <out sqrt2='{math:sqrt(2.0e0)}' " +
-    //                                  @"      defaultNamespace='{env:defaultNamespace()}' " +
-    //                                  @"      sqrtEmpty='{math:sqrt(())}'> " +
-    //                                  @"   <defaultNS value='{env:defaultNamespace()}' xsl:xpath-default-namespace='http://default.namespace.com/' /> " +
-    //                                  @" </out> " +
-    //                                  @" </xsl:template> " +
-    //                                  @" </xsl:transform>";
-
-
-    //        // Register the integrated extension functions math:sqrt and env:defaultNamespace
-    //        processor.RegisterExtensionFunction(new Sqrt());
-    //        processor.RegisterExtensionFunction(new DefaultNamespace());
-
-    //        // Create a transformer for the stylesheet.
-    //        Xslt30Transformer transformer = processor.newXsltCompiler().compile(new StringReader(stylesheet)).load30();
-
-    //        // Create a serializer, with output to the standard output stream
-    //        Serializer serializer = processor.newSerializer();
-    //        serializer.OutputWriter = Console.Out;
-    //        serializer.SetOutputProperty(Serializer.INDENT, "yes");
-
-    //        // Transform the source XML, calling a named initial template, and serialize the result document
-    //        transformer.CallTemplate(new QName("go"), serializer);
-    //    }
-
-    //}
-
-    ///// <summary>
-    ///// Example extension function to compute a square root, using the full API
-    ///// </summary>
-
-    //public class Sqrt : ExtensionFunctionDefinition
-    //{
-    //    public override QName FunctionName => new QName("http://example.math.co.uk/demo", "sqrt");
-
-    //    public override int MinimumNumberOfArguments => 1;
-
-    //    public override int MaximumNumberOfArguments => 1;
-
-    //    public override XdmSequenceType[] ArgumentTypes =>
-    //        new[]{
-    //            new XdmSequenceType(XdmAtomicType.BuiltInAtomicType(QName.XS_DOUBLE), '?')
-    //        };
-
-    //    public override XdmSequenceType ResultType(XdmSequenceType[] ArgumentTypes)
-    //    {
-    //        return new(XdmAtomicType.BuiltInAtomicType(QName.XS_DOUBLE), '?');
-    //    }
-
-    //    public override bool TrustResultType => true;
+            // Create the stylesheet
+            const string stylesheet = @"<xsl:transform version='3.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'" +
+                                      @"      xmlns:math='http://example.math.co.uk/demo' " +
+                                      @"      xmlns:env='http://example.env.co.uk/demo' " +
+                                      @"      exclude-result-prefixes='math env'> " +
+                                      @" <xsl:template name='xsl:initial-template'> " +
+                                      @" <out sqrt2='{math:sqrt(2.0e0)}' " +
+                                      @"      defaultNamespace='{env:defaultNamespace()}' " +
+                                      @"      sqrtEmpty='{math:sqrt(())}'> " +
+                                      @"   <defaultNS value='{env:defaultNamespace()}' xsl:xpath-default-namespace='http://default.namespace.com/' /> " +
+                                      @" </out> " +
+                                      @" </xsl:template> " +
+                                      @" </xsl:transform>";
 
 
-    //    public override ExtensionFunctionCall MakeFunctionCall()
-    //    {
-    //        return new SqrtCall();
-    //    }
-    //}
+            // Register the integrated extension functions math:sqrt and env:defaultNamespace
+            processor.registerExtensionFunction(new Sqrt());
+            processor.registerExtensionFunction(new DefaultNamespace());
 
-    //internal class SqrtCall : ExtensionFunctionCall
-    //{
-    //    public override XdmValue Call(XdmValue[] arguments, DynamicContext context)
-    //    {
-    //        if (arguments[0].Empty)
-    //        {
-    //            return XdmEmptySequence.Instance;
-    //        }
-    //        XdmAtomicValue arg = (XdmAtomicValue)arguments[0].ItemAt(0);
-    //        double val = (double)arg.Value;
-    //        double sqrt = System.Math.Sqrt(val);
-    //        return new XdmAtomicValue(sqrt);
-    //    }
-    //}
+            // Create a transformer for the stylesheet.
+            Xslt30Transformer transformer = processor.newXsltCompiler().compile(new StreamSource(new StringReader(stylesheet))).load30();
 
-    ///// <summary>
-    ///// Example extension function to return the default namespace from the static context
-    ///// </summary>
+            // Create a serializer, with output to the standard output stream
+            Serializer serializer = processor.newSerializer();
+            serializer.setOutputStream(java.lang.System.@out);// = Console.Out;
+            serializer.setOutputProperty(Serializer.Property.INDENT, "yes");
 
-    //public class DefaultNamespace : ExtensionFunctionDefinition
-    //{
-    //    public override QName FunctionName => new QName("http://example.env.co.uk/demo", "defaultNamespace");
+            // Transform the source XML, calling a named initial template, and serialize the result document
+            transformer.callTemplate(null, serializer);
+        }
 
-    //    public override int MinimumNumberOfArguments => 0;
+    }
 
-    //    public override int MaximumNumberOfArguments => 0;
+    /// <summary>
+    /// Example extension function to compute a square root, using the full API
+    /// </summary>
 
-    //    public override XdmSequenceType[] ArgumentTypes => Array.Empty<XdmSequenceType>();
+    public class Sqrt : ExtensionFunctionDefinition
+    {
+        //public override QName FunctionName => new QName("http://example.math.co.uk/demo", "sqrt");
 
-    //    public override bool DependsOnFocus => true;
+        //public override int MinimumNumberOfArguments => 1;
 
-    //    // actually it depends on the static context rather than the focus; but returning true is necessary
-    //    // to avoid the call being extracted to a global variable.
-    //    public override XdmSequenceType ResultType(XdmSequenceType[] ArgumentTypes)
-    //    {
-    //        return new(XdmAtomicType.BuiltInAtomicType(QName.XS_STRING), '?');
-    //    }
+        //public override int MaximumNumberOfArguments => 1;
 
-    //    public override bool TrustResultType => true;
+        //public override XdmSequenceType[] ArgumentTypes =>
+        //    new[]{
+        //        new XdmSequenceType(XdmAtomicType.BuiltInAtomicType(QName.XS_DOUBLE), '?')
+        //    };
 
-    //    public override ExtensionFunctionCall MakeFunctionCall()
-    //    {
-    //        return new DefaultNamespaceCall();
-    //    }
-    //}
+        //public override XdmSequenceType ResultType(XdmSequenceType[] ArgumentTypes)
+        //{
+        //    return new(XdmAtomicType.BuiltInAtomicType(QName.XS_DOUBLE), '?');
+        //}
 
-    //internal class DefaultNamespaceCall : ExtensionFunctionCall
-    //{
-    //    private string defaultNamespace;
+        //public override bool TrustResultType => true;
 
-    //    public override void SupplyStaticContext(StaticContext context)
-    //    {
-    //        defaultNamespace = context.GetNamespaceForPrefix("");
-    //    }
 
-    //    public override XdmValue Call(XdmValue[] arguments, DynamicContext context)
-    //    {
-    //        return defaultNamespace != null ? new XdmAtomicValue(defaultNamespace) : XdmEmptySequence.Instance;
-    //    }
-    //}
+        //public override ExtensionFunctionCall MakeFunctionCall()
+        //{
+        //    return new SqrtCall();
+        //}
+
+        public override int getMinimumNumberOfArguments()
+        {
+            return 1;
+        }
+
+        public override int getMaximumNumberOfArguments()
+        {
+            return 1;
+        }
+        public override net.sf.saxon.value.SequenceType[] getArgumentTypes()
+        {
+            return new net.sf.saxon.value.SequenceType[] { net.sf.saxon.value.SequenceType.OPTIONAL_DOUBLE};
+        }
+
+        public override StructuredQName getFunctionQName()
+        {
+            return new QName("http://example.math.co.uk/demo", "sqrt").getStructuredQName();
+        }
+
+        public override net.sf.saxon.value.SequenceType getResultType(net.sf.saxon.value.SequenceType[] starr)
+        {
+            return net.sf.saxon.value.SequenceType.OPTIONAL_DOUBLE;
+        }
+
+        public override ExtensionFunctionCall makeCallExpression()
+        {
+            return new SqrtCall();
+        }
+    }
+
+    internal class SqrtCall : ExtensionFunctionCall
+    {
+        //public override XdmValue Call(XdmValue[] arguments, DynamicContext context)
+        //{
+        //    if (arguments[0].Empty)
+        //    {
+        //        return XdmEmptySequence.Instance;
+        //    }
+        //    XdmAtomicValue arg = (XdmAtomicValue)arguments[0].ItemAt(0);
+        //    double val = (double)arg.Value;
+        //    double sqrt = System.Math.Sqrt(val);
+        //    return new XdmAtomicValue(sqrt);
+        //}
+        public override Sequence call(XPathContext xpc, Sequence[] arguments)
+        {
+            if (arguments[0].Equals(EmptySequence.getInstance()))
+            {
+                return EmptySequence.getInstance();
+            }
+            double val = ((DoubleValue)arguments[0]).getDoubleValue();
+            double sqrt = System.Math.Sqrt(val);
+            return new DoubleValue(sqrt);
+        }
+    }
+
+    /// <summary>
+    /// Example extension function to return the default namespace from the static context
+    /// </summary>
+
+    public class DefaultNamespace : ExtensionFunctionDefinition
+    {
+        //public override QName FunctionName => new QName("http://example.env.co.uk/demo", "defaultNamespace");
+
+        //public override int MinimumNumberOfArguments => 0;
+
+        //public override int MaximumNumberOfArguments => 0;
+
+        //public override XdmSequenceType[] ArgumentTypes => Array.Empty<XdmSequenceType>();
+
+        //public override bool DependsOnFocus => true;
+
+        //// actually it depends on the static context rather than the focus; but returning true is necessary
+        //// to avoid the call being extracted to a global variable.
+        //public override XdmSequenceType ResultType(XdmSequenceType[] ArgumentTypes)
+        //{
+        //    return new(XdmAtomicType.BuiltInAtomicType(QName.XS_STRING), '?');
+        //}
+
+        //public override bool TrustResultType => true;
+
+        //public override ExtensionFunctionCall MakeFunctionCall()
+        //{
+        //    return new DefaultNamespaceCall();
+        //}
+        public override net.sf.saxon.value.SequenceType[] getArgumentTypes()
+        {
+            return Array.Empty<net.sf.saxon.value.SequenceType>();
+        }
+
+        public override StructuredQName getFunctionQName()
+        {
+            return new QName("http://example.env.co.uk/demo", "defaultNamespace").getStructuredQName();
+        }
+
+        public override bool dependsOnFocus()
+        {
+            return true;
+        }
+
+        public override int getMinimumNumberOfArguments()
+        {
+            return 0;
+        }
+
+        public override int getMaximumNumberOfArguments()
+        {
+            return 0;
+        }
+
+        public override bool trustResultType()
+        {
+            return true;
+        }
+
+        public override net.sf.saxon.value.SequenceType getResultType(net.sf.saxon.value.SequenceType[] starr)
+        {
+            return net.sf.saxon.value.SequenceType.OPTIONAL_STRING;
+        }
+
+        public override ExtensionFunctionCall makeCallExpression()
+        {
+            return new DefaultNamespaceCall();
+        }
+    }
+
+    internal class DefaultNamespaceCall : ExtensionFunctionCall
+    {
+        private string defaultNamespace;
+
+        public override Sequence call(XPathContext xpc, Sequence[] sarr)
+        {
+            return defaultNamespace != null ? new StringValue(defaultNamespace) : EmptySequence.getInstance();
+        }
+
+        public override void supplyStaticContext(StaticContext context, int locationId, Expression[] arguments)
+        {
+            base.supplyStaticContext(context, locationId, arguments);
+            defaultNamespace = context.getNamespaceResolver().getURIForPrefix("", true);
+        }
+
+
+        //public override XdmValue call(XdmValue[] arguments, DynamicContext context)
+        //{
+        //    return defaultNamespace != null ? new XdmAtomicValue(defaultNamespace) : XdmEmptySequence.Instance;
+        //}
+    }
 
     ///// <summary>
     ///// Show a transformation using calls to an extension function implemented using a lambda expression
