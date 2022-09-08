@@ -1852,8 +1852,8 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             XQueryExecutable exp = compiler.compile("<saxon:example>{static-base-uri()}</saxon:example>");
             XQueryEvaluator eval = exp.load();
             Serializer qout = processor.newSerializer();
-            //qout.setOutputProperty(Serializer.METHOD, "xml");
-            //qout.setOutputProperty(Serializer.INDENT, "yes");
+            qout.setOutputProperty(Serializer.Property.METHOD, "xml");
+            qout.setOutputProperty(Serializer.Property.INDENT, "yes");
             //qout.setOutputProperty(Serializer.SAXON_INDENT_SPACES, "1");
             qout.setOutputStream(new FileOutputStream("testoutput.xml"));
             Console.WriteLine("Output written to testoutput.xml");
@@ -2515,7 +2515,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             // Create a serializer, with output to the standard output stream
             Serializer serializer = processor.newSerializer();
             serializer.setOutputStream(java.lang.System.@out);
-            //  serializer.SetOutputProperty(Serializer.INDENT, "yes");
+            serializer.setOutputProperty(Serializer.Property.INDENT, "yes");
 
             // Transform the source XML, calling a named initial template, and serialize the result document.
             transformer.callTemplate(new QName("main"), serializer);
