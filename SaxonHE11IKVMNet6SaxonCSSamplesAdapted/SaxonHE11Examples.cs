@@ -17,6 +17,7 @@ using System.Reflection;
 using StringReader = java.io.StringReader;
 using net.sf.saxon.om;
 using net.sf.saxon.value;
+using sun.font;
 
 namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 {
@@ -83,7 +84,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 //new XQueryFromXmlReader(),
                 new XQueryToSerializedSequence(),
                 new XQueryUsingParameter(),
-                //new XQueryMultiModule(),
+                new XQueryMultiModule(),
                 new XQueryTryCatch(),
                 new XQueryExtensibility(),
                 //new XQueryUpdate(),
@@ -2125,44 +2126,70 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     }
 
-    ///// <summary>
-    ///// Show a query consisting of two modules, using a QueryResolver to resolve
-    ///// the "import module" declaration
-    ///// </summary>
+    /// <summary>
+    /// Show a query consisting of two modules, using a QueryResolver to resolve
+    /// the "import module" declaration
+    /// </summary>
 
-    //public class XQueryMultiModule : Example
-    //{
+    public class XQueryMultiModule : Example
+    {
 
-    //    public override string testName => "XQueryMultiModule";
+        public override string testName => "XQueryMultiModule";
 
-    //    public override void run(URL samplesDir)
-    //    {
+        public override void run(URL samplesDir)
+        {
 
-    //        const string mod1 = "import module namespace m2 = 'http://www.example.com/module2';" +
-    //                            "m2:square(3)";
+            const string mod1 = "import module namespace m2 = 'http://www.example.com/module2';" +
+                                "m2:square(3)";
 
-    //        const string mod2 = "module namespace m2 = 'http://www.example.com/module2';" +
-    //                            "declare function m2:square($p) { $p * $p };";
+            const string mod2 = "module namespace m2 = 'http://www.example.com/module2';" +
+                                "declare function m2:square($p) { $p * $p };";
 
-    //        Processor processor = new(false);
-    //        XQueryCompiler compiler = processor.newXQueryCompiler();
-    //        compiler.XQueryResolver = (module, queryBase, hints) => {
-    //            if (module == "http://www.example.com/module2")
-    //            {
-    //                return new[] {
-    //                    new TextResource(mod2, new Uri(module))
-    //                };
-    //            }
-    //            return null;
-    //        };
-    //        XQueryExecutable exp = compiler.compile(mod1);
-    //        XQueryEvaluator eval = exp.Load();
+            Processor processor = new(false);
+            XQueryCompiler compiler = processor.newXQueryCompiler();
+            compiler.setModuleURIResolver(new SimpleModuleURIResolver(new Dictionary<string, string>() { 
+                { "http://www.example.com/module2", mod2 }
+            })); 
+            
+            //= (module, queryBase, hints) =>
+            //{
+            //    if (module == "http://www.example.com/module2")
+            //    {
+            //        return new[] {
+            //            new TextResource(mod2, new Uri(module))
+            //        };
+            //    }
+            //    return null;
+            //};
 
-    //        XdmAtomicValue result = (XdmAtomicValue)eval.evaluateSingle();
-    //        Console.WriteLine("Result type: " + result.Value.GetType());
-    //        Console.WriteLine("Result value: " + (long)result.Value);
-    //    }
-    //}
+            XQueryExecutable exp = compiler.compile(mod1);
+            XQueryEvaluator eval = exp.load();
+
+            XdmAtomicValue result = (XdmAtomicValue)eval.evaluateSingle();
+            Console.WriteLine("Result type: " + result.getValue().GetType());
+            Console.WriteLine("Result value: " + result.getLongValue());
+        }
+
+        internal class SimpleModuleURIResolver : ModuleURIResolver
+        {
+            private Dictionary<string, string> moduleMap;
+
+            internal SimpleModuleURIResolver(Dictionary<string, string> moduleMap)
+            {
+                this.moduleMap = moduleMap;
+            }
+            public StreamSource[] resolve(string module, string queryBase, string[] hints)
+            {
+                if (moduleMap.ContainsKey(module))
+                {
+                    return new[] {
+                        new StreamSource(new StringReader(moduleMap[module]), module)                   
+                    };
+                }
+                return null;
+            }
+        }
+    }
 
     /// <summary>
     /// Demonstrate using a try-catch expression in the query, a feature of XQuery 3.0
