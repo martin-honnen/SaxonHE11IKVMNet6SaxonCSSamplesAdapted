@@ -1754,7 +1754,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
         }
 
 
-        //public override XdmValue call(XdmValue[] arguments, DynamicContext context)
+        //public override XdmValue Call(XdmValue[] arguments, DynamicContext context)
         //{
         //    return defaultNamespace != null ? new XdmAtomicValue(defaultNamespace) : XdmEmptySequence.Instance;
         //}
