@@ -70,7 +70,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 //new XsltShowingLineNumbers(),
                 new XsltStreamDoc(),
                 new XsltMultipleOutput(),
-                //new XsltUsingResultHandler(),
+                new XsltUsingResultHandler(),
                 new XsltUsingIdFunction(),
                 //new XsltUsingCollectionFinder(),
                 new XsltUsingDirectoryCollection(),
@@ -1367,66 +1367,98 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     }
 
-    ///// <summary>
-    ///// Show a transformation using a user-written result document handler. This example
-    ///// captures each of the result documents in a DOM, and creates a Hashtable that indexes
-    ///// the DOM trees according to their absolute URI. On completion, it writes all the DOMs
-    ///// to the standard output.
-    ///// </summary>
+    /// <summary>
+    /// Show a transformation using a user-written result document handler. This example
+    /// captures each of the result documents in an XdmDestination, and creates a Dictionary that indexes
+    /// the DOM trees according to their absolute URI. On completion, it writes all the XDM trees
+    /// to the standard output.
+    /// </summary>
 
-    //public class XsltUsingResultHandler : Example
-    //{
+    public class XsltUsingResultHandler : Example
+    {
 
-    //    public override string testName => "XsltUsingResultHandler";
+        public override string testName => "XsltUsingResultHandler";
 
-    //    public override void run(URL samplesDir)
-    //    {
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
+        public override void run(URL samplesDir)
+        {
+            // Create a Processor instance.
+            Processor processor = new(false);
 
-    //        // Load the source document
-    //        XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/othello.xml"));
+            // Load the source document
+            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/othello.xml").toURI().toASCIIString()));
 
-    //        // Define a stylesheet that splits the document up
-    //        const string stylesheet = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='2.0'>\n" +
-    //                                  "<xsl:template match='/'>\n" +
-    //                                  "  <xsl:for-each select='//ACT'>\n" +
-    //                                  "    <xsl:result-document href='{position()}.xml'>\n" +
-    //                                  "      <xsl:copy-of select='TITLE'/>\n" +
-    //                                  "    </xsl:result-document>\n" +
-    //                                  "  </xsl:for-each>\n" +
-    //                                  "</xsl:template>\n" +
-    //                                  "</xsl:stylesheet>";
+            // Define a stylesheet that splits the document up
+            const string stylesheet = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='3.0'>\n" +
+                                      "<xsl:template match='/'>\n" +
+                                      "  <xsl:for-each select='//ACT'>\n" +
+                                      "    <xsl:result-document href='{position()}.xml'>\n" +
+                                      "      <xsl:copy-of select='TITLE'/>\n" +
+                                      "    </xsl:result-document>\n" +
+                                      "  </xsl:for-each>\n" +
+                                      "</xsl:template>\n" +
+                                      "</xsl:stylesheet>";
 
-    //        XsltCompiler compiler = processor.newXsltCompiler();
-    //        compiler.BaseUri = new Uri("http://localhost/stylesheet");
-    //        XsltExecutable exec = compiler.compile(new StringReader(stylesheet));
+            XsltCompiler compiler = processor.newXsltCompiler();
+            //compiler.BaseUri = new Uri("http://localhost/stylesheet");
+            XsltExecutable exec = compiler.compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
 
-    //        // Create a transformer for the stylesheet.
-    //        Xslt30Transformer transformer = exec.load30();
+            // Create a transformer for the stylesheet.
+            Xslt30Transformer transformer = exec.load30();
 
-    //        // Establish the result document handler
-    //        Dictionary<string, DomDestination> results = new();
-    //        transformer.ResultDocumentHandler = (href, baseUri) => {
-    //            return results[href] = new DomDestination();
-    //        };
+            // Establish the result document handler
+            Dictionary<string, XdmDestination> results = new();
 
-    //        // Transform the source XML to a NullDestination (because we only want the secondary result files).
-    //        NullDestination destination = new() { BaseUri = samplesDir };
-    //        transformer.applyTemplates(input, destination);
 
-    //        // Process the captured DOM results
-    //        foreach (var entry in results)
-    //        {
-    //            string uri = entry.Key;
-    //            Console.WriteLine("\nResult File " + uri);
-    //            DomDestination dom = results[uri];
-    //            Console.Write(dom.XmlDocument.OuterXml);
-    //        }
+            //transformer.ResultDocumentHandler = (href, baseUri) =>
+            //{
+            //    return results[href] = new DomDestination();
+            //};
 
-    //    }
+            transformer.setResultDocumentHandler(new SimpleResultDocumentHandler(results));
 
-    //}
+            // Transform the source XML to a NullDestination (because we only want the secondary result files).
+            NullDestination destination = new();// { BaseUri = samplesDir };
+            destination.setDestinationBaseURI(samplesDir.toURI());
+            transformer.applyTemplates(input, destination);
+
+            // Process the captured DOM results
+            foreach (var entry in results)
+            {
+                string uri = entry.Key;
+                Console.WriteLine("\nResult File " + uri);
+                XdmDestination result = results[uri];
+                Console.Write(result.getXdmNode());
+            }
+
+        }
+
+        internal class SimpleResultDocumentHandler : java.util.function.Function
+        {
+            private Dictionary<string, XdmDestination> results;
+
+            internal SimpleResultDocumentHandler(Dictionary<string, XdmDestination> results)
+            {
+                this.results = results;
+            }
+            public java.util.function.Function andThen(java.util.function.Function after)
+            {
+                throw new NotImplementedException();
+            }
+
+            public object apply(object uri)
+            {
+                var jURI = (URI)uri;
+                results[jURI.toASCIIString()] = new XdmDestination();
+                return results[jURI.toASCIIString()];
+            }
+
+            public java.util.function.Function compose(java.util.function.Function before)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+    }
 
     ///// <summary>
     ///// Show a transformation using a user-supplied collection finder
