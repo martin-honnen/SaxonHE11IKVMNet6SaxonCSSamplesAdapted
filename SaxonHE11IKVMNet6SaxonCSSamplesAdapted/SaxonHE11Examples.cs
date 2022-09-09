@@ -62,7 +62,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 //new XsltDomToDom(),
                 new XsltXdmToXdm(),
                 new XsltXdmElementToXdm(),
-                //new XsltUsingSourceResolver(),
+                new XsltUsingSourceResolver(),
                 new XsltSettingOutputProperties(),
                 new XsltDisplayingErrors(),
                 new XsltCapturingErrors(),
@@ -987,64 +987,68 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     }
 
-    ///// <summary>
-    ///// Run an XSLT transformation making use of an XmlResolver to resolve URIs at document build time, at stylesheet compile time 
-    ///// and at transformation run-time
-    ///// </summary>
+    /// <summary>
+    /// Run an XSLT transformation making use of an XmlResolver to resolve URIs (at document build time, )nat stylesheet compile time 
+    /// and at transformation run-time
+    /// </summary>
 
-    //public class XsltUsingSourceResolver : Example
-    //{
+    public class XsltUsingSourceResolver : Example
+    {
 
-    //    public override string testName => "XsltUsingSourceResolver";
+        public override string testName => "XsltUsingSourceResolver";
 
-    //    public override void run(URL samplesDir)
-    //    {
+        public override void run(URL samplesDir)
+        {
 
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
+            // Create a Processor instance.
+            Processor processor = new(false);
 
-    //        // Load the source document
-    //        DocumentBuilder builder = processor.newDocumentBuilder();
-    //        UserXmlResolver buildTimeResolver = new();
-    //        buildTimeResolver.Message = "** Calling build-time XmlResolver: ";
-    //        builder.XmlDocumentResolver = buildTimeResolver.GetResourceResolver();
-    //        builder.BaseUri = samplesDir;
+            // Load the source document
+            DocumentBuilder builder = processor.newDocumentBuilder();
 
-    //        String doc = "<!DOCTYPE doc [<!ENTITY e SYSTEM 'flamingo.txt'>]><doc>&e;</doc>";
-    //        MemoryStream ms = new();
-    //        StreamWriter tw = new(ms);
-    //        tw.Write(doc);
-    //        tw.Flush();
-    //        Stream instr = new MemoryStream(ms.GetBuffer(), 0, (int)ms.Length);
-    //        XdmNode input = builder.Build(instr);
+            //UserXmlResolver buildTimeResolver = new() { Message = "** Calling build-time XmlResolver: " };
 
-    //        // Create a transformer for the stylesheet.
-    //        const string stylesheet = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='2.0'>" +
-    //                                  "<xsl:import href='empty.xslt'/>" +
-    //                                  "<xsl:template match='/'>" +
-    //                                  "<out note=\"{doc('heron.txt')}\" ><xsl:copy-of select='.'/></out>" +
-    //                                  "</xsl:template>" +
-    //                                  "</xsl:stylesheet>";
+            //builder.setResourceResolver(buildTimeResolver); //.XmlDocumentResolver = buildTimeResolver.GetResourceResolver();
 
-    //        XsltCompiler compiler = processor.newXsltCompiler();
-    //        UserXmlResolver compileTimeResolver = new() { Message = "** Calling compile-time XmlResolver: " };
-    //        compiler.StylesheetModuleResolver = compileTimeResolver.GetResourceResolver();
-    //        compiler.BaseUri = samplesDir;
-    //        Xslt30Transformer transformer = compiler.compile(new XmlTextReader(new StringReader(stylesheet))).load30();
+            builder.setBaseURI(samplesDir.toURI()); //.BaseUri = samplesDir;
 
-    //        // Set the user-written XmlResolver
-    //        UserXmlResolver runTimeResolver = new() { Message = "** Calling transformation-time XmlResolver: " };
-    //        transformer.XmlDocumentResolver = runTimeResolver.GetResourceResolver();
+            // On the Java side of the s9api in Saxon 11, there doesn't seem to be a direct way to set up any ResourceResolver on the DocumentBuilder,
+            // so this example, for the time being, just parses a normal XML document without resolving any external entity
+            String doc = "<!DOCTYPE doc [<!ENTITY e 'flamingo.txt'>]><doc>&e;</doc>"; //"<!DOCTYPE doc [<!ENTITY e SYSTEM 'flamingo.txt'>]><doc>&e;</doc>";
+            //MemoryStream ms = new();
+            //StreamWriter tw = new(ms);
+            //tw.Write(doc);
+            //tw.Flush();
+            //Stream instr = new MemoryStream(ms.GetBuffer(), 0, (int)ms.Length);
+            XdmNode input = builder.build(new StreamSource(new StringReader(doc)));
 
-    //        // Create a serializer
-    //        Serializer serializer = processor.newSerializer();
-    //        serializer.OutputWriter = Console.Out;
+            // Create a transformer for the stylesheet.
+            const string stylesheet = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='3.0'>" +
+                                      "<xsl:import href='empty.xslt'/>" +
+                                      "<xsl:template match='/'>" +
+                                      "<out note=\"{doc('heron.txt')}\" ><xsl:copy-of select='.'/></out>" +
+                                      "</xsl:template>" +
+                                      "</xsl:stylesheet>";
 
-    //        // Transform the source XML and serialize the result document
-    //        transformer.applyTemplates(input, serializer);
+            XsltCompiler compiler = processor.newXsltCompiler();
+            UserXmlResolver compileTimeResolver = new() { Message = "** Calling compile-time XmlResolver: " };
+            compiler.setResourceResolver(compileTimeResolver); //StylesheetModuleResolver = compileTimeResolver.GetResourceResolver();
+            //compiler.BaseUri = samplesDir;
+            Xslt30Transformer transformer = compiler.compile(new StreamSource(new StringReader(stylesheet), samplesDir.toURI().toASCIIString())).load30();
 
-    //    }
-    //}
+            // Set the user-written XmlResolver
+            UserXmlResolver runTimeResolver = new() { Message = "** Calling transformation-time XmlResolver: " };
+            transformer.setResourceResolver(runTimeResolver);  //XmlDocumentResolver = runTimeResolver.GetResourceResolver();
+
+            // Create a serializer
+            Serializer serializer = processor.newSerializer();
+            serializer.setOutputStream(java.lang.System.@out); //.OutputWriter = Console.Out;
+
+            // Transform the source XML and serialize the result document
+            transformer.applyTemplates(input, serializer);
+
+        }
+    }
 
     /// <summary>
     /// Run an XSLT transformation displaying compile-time errors to the console
@@ -2735,45 +2739,67 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
     //    }
     //}
 
-    /////
-    ///// A factory class to generate a resource resolver. In the case of a URI ending with ".txt",
-    ///// the resource resolver returns the URI itself, wrapped as an XML document. 
-    ///// In the case of the URI "empty.xslt", it returns an empty
-    ///// stylesheet. In all other cases, it returns null, which has the effect of delegating
-    ///// processing to the standard XmlResolver.
-    /////
+    ///
+    /// A factory class to generate a resource resolver. In the case of a URI ending with ".txt",
+    /// the resource resolver returns the URI itself, wrapped as an XML document. 
+    /// In the case of the URI "empty.xslt", it returns an empty
+    /// stylesheet. In all other cases, it returns null, which has the effect of delegating
+    /// processing to the standard XmlResolver.
+    ///
 
-    //public class UserXmlResolver
-    //{
+    public class UserXmlResolver : ResourceResolver
+    {
 
-    //    public string Message = null;
+        public string Message = null;
 
-    //    public ResourceResolver GetResourceResolver()
-    //    {
-    //        return (request) => {
-    //            Uri uri = request.Uri;
-    //            if (Message != null)
-    //            {
-    //                Console.WriteLine(Message + uri + " (nature=" + request.Nature + ")");
-    //            }
+        //public ResourceResolver GetResourceResolver()
+        //{
+        //    return (request) =>
+        //    {
+        //        Uri uri = request.Uri;
+        //        if (Message != null)
+        //        {
+        //            Console.WriteLine(Message + uri + " (nature=" + request.Nature + ")");
+        //        }
 
-    //            if (uri.ToString().EndsWith(".txt"))
-    //            {
-    //                return new TextResource("<uri>" + uri + "</uri>", uri);
-    //            }
+        //        if (uri.ToString().EndsWith(".txt"))
+        //        {
+        //            return new TextResource("<uri>" + uri + "</uri>", uri);
+        //        }
 
-    //            if (uri.ToString().EndsWith("empty.xslt"))
-    //            {
-    //                return new TextResource("<transform xmlns='http://www.w3.org/1999/XSL/Transform' version='2.0'/>",
-    //                    uri);
-    //            }
-    //            else
-    //            {
-    //                return null;
-    //            }
-    //        };
-    //    }
+        //        if (uri.ToString().EndsWith("empty.xslt"))
+        //        {
+        //            return new TextResource("<transform xmlns='http://www.w3.org/1999/XSL/Transform' version='3.0'/>",
+        //                uri);
+        //        }
+        //        else
+        //        {
+        //            return null;
+        //        }
+        //    };
+        //}
 
+        public Source resolve(ResourceRequest request)
+        {
+            var uri = request.uri;
+            if (Message != null)
+            {
+                Console.WriteLine(Message + uri + " (nature=" + request.purpose + ")");
+            }
 
-    //}
+            if (uri.EndsWith(".txt"))
+            {
+                return new StreamSource(new StringReader("<uri>" + uri + "</uri>"), uri);
+            }
+
+            if (uri.ToString().EndsWith("empty.xslt"))
+            {
+                return new StreamSource(new StringReader("<transform xmlns='http://www.w3.org/1999/XSL/Transform' version='3.0'/>"), uri);
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
 }
