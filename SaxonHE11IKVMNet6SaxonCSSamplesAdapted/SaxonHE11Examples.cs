@@ -19,6 +19,7 @@ using net.sf.saxon.om;
 using net.sf.saxon.value;
 using sun.font;
 using javax.xml.transform;
+using net.sf.saxon.resource;
 
 namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 {
@@ -72,7 +73,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 new XsltMultipleOutput(),
                 new XsltUsingResultHandler(),
                 new XsltUsingIdFunction(),
-                //new XsltUsingCollectionFinder(),
+                new XsltUsingCollectionFinder(),
                 new XsltUsingDirectoryCollection(),
                 new XsltIntegratedExtension(),
                 new XsltSimpleExtension(),
@@ -1460,92 +1461,117 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     }
 
-    ///// <summary>
-    ///// Show a transformation using a user-supplied collection finder
-    ///// </summary>
-
-    //public class XsltUsingCollectionFinder : Example
-    //{
-
-    //    public override string testName => "XsltUsingCollectionFinder";
-
-    //    public override void run(URL samplesDir)
-    //    {
-    //        // Create a Processor instance.
-    //        Processor processor = new(false);
-    //        DocumentBuilder builder = processor.newDocumentBuilder();
-
-    //        // Define a stylesheet that uses the collection() function
-    //        const string stylesheet = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='2.0'>\n" +
-    //                                  "<xsl:template name='main'>\n" +
-    //                                  " <out>\n" +
-    //                                  "  <xsl:for-each select=\"collection('http://www.example.org/my-collection')\">\n" +
-    //                                  "    <document uri='{document-uri(.)}' nodes='{count(//*)}'/>\n" +
-    //                                  "  </xsl:for-each><zzz/>\n" +
-    //                                  "  <xsl:for-each select=\"collection('http://www.example.org/my-collection')\">\n" +
-    //                                  "    <document uri='{document-uri(.)}' nodes='{count(//*)}'/>\n" +
-    //                                  "  </xsl:for-each>\n" +
-    //                                  " </out>\n" +
-    //                                  "</xsl:template>\n" +
-    //                                  "</xsl:stylesheet>";
-
-    //        // Register the collection finder
-    //        processor.CollectionFinder = uri => {
-    //            if (uri.ToString() == "http://www.example.org/my-collection")
-    //            {
-    //                List<IResource> resources = new() {
-    //                    new XmlFileResource(builder, samplesDir + "data/books.xml"),
-    //                    new XmlFileResource(builder, samplesDir + "data/othello.xml")
-    //                };
-    //                return resources;
-    //            }
-    //            return processor.StandardCollectionFinder(uri);
-    //        };
-
-    //        XsltCompiler compiler = processor.newXsltCompiler();
-    //        compiler.BaseUri = new Uri("http://localhost/stylesheet");
-    //        XsltExecutable exec = compiler.compile(new StringReader(stylesheet));
-
-    //        // Create a transformer for the stylesheet.
-    //        Xslt30Transformer transformer = exec.load30();
-
-    //        // Set the destination
-    //        XdmDestination results = new();
-
-    //        // Transform the XML, calling a named initial template
-    //        transformer.CallTemplate(new QName("", "main"), results);
-
-    //        // Show the result
-    //        Console.WriteLine(results.XdmNode.ToString());
-
-    //    }
-
-    //    private class XmlFileResource : IResource
-    //    {
-    //        private readonly string fileName;
-    //        private readonly DocumentBuilder builder;
-
-    //        public XmlFileResource(DocumentBuilder builder, string fileName)
-    //        {
-    //            this.builder = builder;
-    //            this.fileName = fileName;
-    //        }
-    //        public Uri ResourceUri => new Uri(fileName);
-
-    //        public XdmItem GetXdmItem()
-    //        {
-    //            return builder.Build(ResourceUri);
-    //        }
-
-    //        public string ContentType => "application/xml";
-    //    }
-    //}
-
     /// <summary>
-    /// Show a transformation using a collection that maps to a directory
+    /// Show a transformation using a user-supplied collection finder
     /// </summary>
 
-    public class XsltUsingDirectoryCollection : Example
+    public class XsltUsingCollectionFinder : Example
+    {
+        public override string testName => "XsltUsingCollectionFinder";
+
+        public override void run(URL samplesDir)
+        {
+            // Create a Processor instance.
+            Processor processor = new(false);
+            DocumentBuilder builder = processor.newDocumentBuilder();
+
+            // Define a stylesheet that uses the collection() function
+            const string stylesheet = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='3.0'>\n" +
+                                      "<xsl:template name='xsl:initial-template'>\n" +
+                                      " <out>\n" +
+                                      "  <xsl:for-each select=\"collection('http://www.example.org/my-collection')\">\n" +
+                                      "    <document uri='{base-uri(.)}' nodes='{count(//*)}'/>\n" +
+                                      "  </xsl:for-each><zzz/>\n" +
+                                      "  <xsl:for-each select=\"collection('http://www.example.org/my-collection')\">\n" +
+                                      "    <document uri='{base-uri(.)}' nodes='{count(//*)}'/>\n" +
+                                      "  </xsl:for-each>\n" +
+                                      " </out>\n" +
+                                      "</xsl:template>\n" +
+                                      "</xsl:stylesheet>";
+
+            //Register the collection finder
+            //processor.CollectionFinder = uri =>
+            //{
+            //    if (uri.ToString() == "http://www.example.org/my-collection")
+            //    {
+            //        List<IResource> resources = new() {
+            //            new XmlFileResource(builder, samplesDir + "data/books.xml"),
+            //            new XmlFileResource(builder, samplesDir + "data/othello.xml")
+            //        };
+            //        return resources;
+            //    }
+            //    return processor.StandardCollectionFinder(uri);
+            //};
+
+            var collectionURI = "http://www.example.org/my-collection";
+            processor.registerCollection(
+                collectionURI,
+                makeExplicitResourceCollection(
+                    processor,
+                    collectionURI,
+                    new string[] {
+                        new URL(samplesDir, "data/books.xml").toURI().toASCIIString(),
+                        new URL(samplesDir, "data/othello.xml").toURI().toASCIIString()
+                    }
+               )
+            );
+
+            XsltCompiler compiler = processor.newXsltCompiler();
+            //compiler.BaseUri = new Uri("http://localhost/stylesheet");
+            XsltExecutable exec = compiler.compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
+
+            // Create a transformer for the stylesheet.
+            Xslt30Transformer transformer = exec.load30();
+
+            // Set the destination
+            XdmDestination results = new();
+
+            // Transform the XML, calling the initial template
+            transformer.callTemplate(null, results);
+
+            // Show the result
+            Console.WriteLine(results.getXdmNode());
+
+        }
+
+        private ResourceCollection makeExplicitResourceCollection(Processor processor, string collectionURI, IEnumerable<string> documentURIs)
+        {
+            var resourceList = new java.util.ArrayList();
+            foreach (var documentURI in documentURIs)
+            {
+                var doc = processor.newDocumentBuilder().build(new StreamSource(documentURI));
+                resourceList.add(new XmlResource(doc.getUnderlyingNode()));
+            }
+            return new ExplicitCollection(processor.getUnderlyingConfiguration(), collectionURI, resourceList);
+        }
+
+        //    private class XmlFileResource : IResource
+        //    {
+        //        private readonly string fileName;
+        //        private readonly DocumentBuilder builder;
+
+        //        public XmlFileResource(DocumentBuilder builder, string fileName)
+        //        {
+        //            this.builder = builder;
+        //            this.fileName = fileName;
+        //        }
+        //        public Uri ResourceUri => new Uri(fileName);
+
+        //        public XdmItem GetXdmItem()
+        //        {
+        //            return builder.Build(ResourceUri);
+        //        }
+
+        //        public string ContentType => "application/xml";
+        //    }
+        //}
+    }
+
+        /// <summary>
+        /// Show a transformation using a collection that maps to a directory
+        /// </summary>
+
+        public class XsltUsingDirectoryCollection : Example
     {
 
         public override string testName => "XsltUsingDirectoryCollection";
