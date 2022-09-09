@@ -99,7 +99,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             string test = "all";
 
             string samplesPath = null;
-            URL samplesDir;
+            Uri samplesDir;
 
             foreach (String s in argv)
             {
@@ -173,7 +173,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
             try
             {
-                samplesDir = new java.io.File(samplesPath).toURI().toURL();
+                samplesDir = new Uri(samplesPath);
             }
             catch
             {
@@ -238,7 +238,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
         /// <summary>
         /// Entry point for running the example
         /// </summary>
-        public abstract void run(URL samplesDir);
+        public abstract void run(Uri samplesDir);
     }
 
 
@@ -251,7 +251,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     //    public override string testName => "XdmNavigation";
 
-    //    public override void run(URL samplesDir)
+    //    public override void run(Uri samplesDir)
     //    {
     //        // Create a Processor instance.
     //        Processor processor = new(false);
@@ -308,13 +308,13 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XPathSimple";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
 
             // Load the source document
-            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));
+            XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/books.xml"));
 
             // Create an XPath compiler
             XPathCompiler xpath = processor.newXPathCompiler();
@@ -340,13 +340,13 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XPathSimple2";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
 
             // Load the source document
-            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));
+            XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/books.xml"));
 
             // Create an XPath compiler
             XPathCompiler xpath = processor.newXPathCompiler();
@@ -371,7 +371,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XPathVariables";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
@@ -400,7 +400,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XPathUndeclaredVariables";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
@@ -434,7 +434,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XPathWithStaticError";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
@@ -459,7 +459,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XPathWithDynamicError";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
@@ -488,16 +488,16 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltSimple1";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
 
             // Load the source document
-            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));// new Uri(samplesDir, "data/books.xml"));
+            XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/books.xml"));
 
             // Create a transformer for the stylesheet.
-            Xslt30Transformer transformer = processor.newXsltCompiler().compile(new StreamSource(new URL(samplesDir, "styles/books.xsl").toURI().toASCIIString())).load30(); // new Uri(samplesDir, "styles/books.xsl")).load30();
+            Xslt30Transformer transformer = processor.newXsltCompiler().Compile(new Uri(samplesDir, "styles/books.xsl")).load30();
 
             // Set the root node of the source document to be the global context item
             transformer.setGlobalContextItem(input);
@@ -520,16 +520,16 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltSimple2";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
 
             // Load the source document
-            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));
+            XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/books.xml"));
 
             // Create a transformer for the stylesheet.
-            Xslt30Transformer transformer = processor.newXsltCompiler().compile(new StreamSource(new URL(samplesDir, "styles/identity.xsl").toURI().toASCIIString())).load30();
+            Xslt30Transformer transformer = processor.newXsltCompiler().Compile(new Uri(samplesDir, "styles/identity.xsl")).load30();
 
             // Create a serializer
             const string outfile = "OutputFromXsltSimple2.xml";
@@ -552,29 +552,29 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltSimple3";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             //if (samplesDir.Scheme != Uri.UriSchemeFile)
             //{
             //    Console.WriteLine("Supplied URI must be a file directory");
             //}
-            string dir = samplesDir.getPath();
-            string sourceFile = Path.Combine(dir, "data/books.xml");
-            string styleFile = Path.Combine(dir, "styles/books.xsl");
+            string dir = samplesDir.LocalPath;
+            string sourceFile = Path.Combine(dir, "data", "books.xml");
+            string styleFile = Path.Combine(dir, "styles", "books.xsl");
 
             // Create a Processor instance.
             Processor processor = new(false);
 
             // Load the source document
             DocumentBuilder builder = processor.newDocumentBuilder();
-            builder.setBaseURI(new java.io.File(sourceFile).toURI());
+            builder.setBaseURI(new Uri(sourceFile).ToURI());
 
-            XdmNode input = builder.build(new java.io.File(sourceFile));
+            XdmNode input = builder.Build(new FileInfo(sourceFile));
 
             // Create a transformer for the stylesheet.
             XsltCompiler compiler = processor.newXsltCompiler();
 
-            Xslt30Transformer transformer = compiler.compile(new StreamSource(new java.io.File(styleFile))).load30();
+            Xslt30Transformer transformer = compiler.Compile(new FileInfo(styleFile)).load30();
 
             // Set the root node of the source document to be the global context item
             transformer.setGlobalContextItem(input);
@@ -598,13 +598,13 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltStripSpace";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             Processor processor = new(false);
 
             // Load the source document
             DocumentBuilder builder = processor.newDocumentBuilder();
-            builder.setBaseURI(samplesDir.toURI());
+            builder.setBaseURI(samplesDir.ToURI());
 
             String doc = "<doc>  <a>  <b>text</b>  </a>  <a/>  </doc>";
             //MemoryStream ms = new();
@@ -612,7 +612,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             //tw.Write(doc);
             //tw.Flush();
             //Stream instr = new MemoryStream(ms.GetBuffer(), 0, (int)ms.Length);
-            XdmNode input = builder.build(new StreamSource(new StringReader(doc)));
+            XdmNode input = builder.build(doc.AsSource());
 
             // Create a transformer for the stylesheet.
             String stylesheet =
@@ -625,7 +625,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
             XsltCompiler compiler = processor.newXsltCompiler();
             //compiler.BaseUri = samplesDir;
-            Xslt30Transformer transformer = compiler.compile(new StreamSource(new StringReader(stylesheet))).load30();
+            Xslt30Transformer transformer = compiler.compile(stylesheet.AsSource()).load30();
 
             // Create a serializer, with output to the standard output stream
             Serializer serializer = processor.newSerializer();
@@ -647,13 +647,13 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltReuseExecutable";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
 
             // Create a compiled stylesheet
-            XsltExecutable templates = processor.newXsltCompiler().compile(new StreamSource(new URL(samplesDir, "styles/summarize.xsl").toURI().toASCIIString()));
+            XsltExecutable templates = processor.newXsltCompiler().Compile(new Uri(samplesDir, "styles/summarize.xsl"));
 
             // Note: we could actually use the same Xslt30Transformer in this case.
             // But in principle, the two transformations could be done in parallel in separate threads.
@@ -664,13 +664,13 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             // Do the first transformation
             Console.WriteLine("\n\n----- transform of " + sourceFile1 + " -----");
             Xslt30Transformer transformer1 = templates.load30();
-            XdmNode input1 = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, sourceFile1).toURI().toASCIIString()));
+            XdmNode input1 = processor.newDocumentBuilder().Build(new Uri(samplesDir, sourceFile1));
             transformer1.applyTemplates(input1, processor.newSerializer(java.lang.System.@out));     // default destination is Console.Out
 
             // Do the second transformation
             Console.WriteLine("\n\n----- transform of " + sourceFile2 + " -----");
             Xslt30Transformer transformer2 = templates.load30();
-            XdmNode input2 = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, sourceFile2).toURI().toASCIIString()));
+            XdmNode input2 = processor.newDocumentBuilder().Build(new Uri(samplesDir, sourceFile2));
             transformer2.applyTemplates(input2, processor.newSerializer(java.lang.System.@out));     // default destination is Console.Out
         }
     }
@@ -685,13 +685,13 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltReuseTransformer";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
 
             // Compile the stylesheet
-            XsltExecutable exec = processor.newXsltCompiler().compile(new StreamSource(new URL(samplesDir, "styles/summarize.xsl").toURI().toASCIIString()));
+            XsltExecutable exec = processor.newXsltCompiler().Compile(new Uri(samplesDir, "styles/summarize.xsl"));
 
             // Create a transformer 
             Xslt30Transformer transformer = exec.load30();
@@ -702,7 +702,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             transformer.setStylesheetParameters(params1);
 
             // Load the 1st source document, building a tree
-            XdmNode input1 = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));
+            XdmNode input1 = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/books.xml"));
 
             // Run the transformer once
             XdmDestination results = new();
@@ -710,7 +710,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             Console.WriteLine("1: " + results.getXdmNode());
 
             // Load the 2nd source document, building a tree
-            XdmNode input2 = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/more-books.xml").toURI().toASCIIString()));
+            XdmNode input2 = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/more-books.xml"));
 
             // Run the transformer again
             results.reset();
@@ -728,21 +728,21 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltFilterChain";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
 
             // Load the source document
-            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));
+            XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/books.xml"));
 
             // Create a compiler
             XsltCompiler compiler = processor.newXsltCompiler();
 
             // Compile all three stylesheets
-            Xslt30Transformer transformer1 = compiler.compile(new StreamSource(new URL(samplesDir, "styles/identity.xsl").toURI().toASCIIString())).load30();
-            Xslt30Transformer transformer2 = compiler.compile(new StreamSource(new URL(samplesDir, "styles/books.xsl").toURI().toASCIIString())).load30();
-            Xslt30Transformer transformer3 = compiler.compile(new StreamSource(new URL(samplesDir, "styles/summarize.xsl").toURI().toASCIIString())).load30();
+            Xslt30Transformer transformer1 = compiler.Compile(new Uri(samplesDir, "styles/identity.xsl")).load30();
+            Xslt30Transformer transformer2 = compiler.Compile(new Uri(samplesDir, "styles/books.xsl")).load30();
+            Xslt30Transformer transformer3 = compiler.Compile(new Uri(samplesDir, "styles/summarize.xsl")).load30();
 
             // Now run them in series
             XdmDestination results1 = new();
@@ -772,19 +772,19 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltXdmToXdm";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
 
             // Load the source document
-            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));
+            XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/books.xml"));
 
             // Create a compiler
             XsltCompiler compiler = processor.newXsltCompiler();
 
             // Compile the stylesheet
-            Xslt30Transformer transformer = compiler.compile(new StreamSource(new URL(samplesDir, "styles/summarize.xsl").toURI().toASCIIString())).load30();
+            Xslt30Transformer transformer = compiler.Compile(new Uri(samplesDir, "styles/summarize.xsl")).load30();
 
             // Run the transformation
             XdmDestination result = new();
@@ -811,13 +811,13 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltXdmElementToXdm";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
 
             // Load the source document
-            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/othello.xml").toURI().toASCIIString()));
+            XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/othello.xml"));
 
             // Navigate to the first grandchild
             XPathSelector eval = processor.newXPathCompiler().compile("/PLAY/FM[1]").load();
@@ -828,7 +828,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             XsltCompiler compiler = processor.newXsltCompiler();
 
             // Compile the stylesheet
-            Xslt30Transformer transformer = compiler.compile(new StreamSource(new URL(samplesDir, "styles/summarize.xsl").toURI().toASCIIString())).load30();
+            Xslt30Transformer transformer = compiler.Compile(new Uri(samplesDir, "styles/summarize.xsl")).load30();
 
             // Run the transformation
             XdmDestination result = new();
@@ -848,7 +848,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     //    public override string testName => "XsltDomToDom";
 
-    //    public override void run(URL samplesDir)
+    //    public override void run(Uri samplesDir)
     //    {
     //        // Create a Processor instance.
     //        Processor processor = new(false);
@@ -883,14 +883,14 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltProcessingInstruction";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
             XsltExecutable exec;
 
             // Load the source document
-            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));
+            XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/books.xml"));
             //Console.WriteLine("=============== source document ===============");
             //Console.WriteLine(input.OuterXml);
             //Console.WriteLine("=========== end of source document ============");
@@ -938,7 +938,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 Console.WriteLine("Locating stylesheet at uri = " + new URL(input.getBaseURI().toURL(), href));
 
                 // Fetch and compile the referenced stylesheet
-                exec = processor.newXsltCompiler().compile(new StreamSource(new URL(input.getBaseURI().toURL(), href).toURI().toASCIIString()));
+                exec = processor.newXsltCompiler().Compile(new Uri(new Uri(input.getBaseURI().toASCIIString()), href));
             }
 
             // Create a transformer 
@@ -964,16 +964,16 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltSettingOutputProperties";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
 
             // Load the source document
-            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));
+            XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/books.xml"));
 
             // Create a transformer for the stylesheet.
-            Xslt30Transformer transformer = processor.newXsltCompiler().compile(new StreamSource(new URL(samplesDir, "styles/summarize.xsl").toURI().toASCIIString())).load30();
+            Xslt30Transformer transformer = processor.newXsltCompiler().Compile(new Uri(samplesDir, "styles/summarize.xsl")).load30();
 
             // Create a serializer, with output to the standard output stream
             Serializer serializer = processor.newSerializer();
@@ -997,7 +997,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltUsingSourceResolver";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
 
             // Create a Processor instance.
@@ -1010,7 +1010,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
             //builder.setResourceResolver(buildTimeResolver); //.XmlDocumentResolver = buildTimeResolver.GetResourceResolver();
 
-            builder.setBaseURI(samplesDir.toURI()); //.BaseUri = samplesDir;
+            builder.setBaseURI(samplesDir.ToURI()) ; //.BaseUri = samplesDir;
 
             // On the Java side of the s9api in Saxon 11, there doesn't seem to be a direct way to set up any ResourceResolver on the DocumentBuilder,
             // so this example, for the time being, just parses a normal XML document without resolving any external entity
@@ -1034,7 +1034,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             UserXmlResolver compileTimeResolver = new() { Message = "** Calling compile-time XmlResolver: " };
             compiler.setResourceResolver(compileTimeResolver); //StylesheetModuleResolver = compileTimeResolver.GetResourceResolver();
             //compiler.BaseUri = samplesDir;
-            Xslt30Transformer transformer = compiler.compile(new StreamSource(new StringReader(stylesheet), samplesDir.toURI().toASCIIString())).load30();
+            Xslt30Transformer transformer = compiler.compile(stylesheet.AsSource()).load30();
 
             // Set the user-written XmlResolver
             UserXmlResolver runTimeResolver = new() { Message = "** Calling transformation-time XmlResolver: " };
@@ -1059,7 +1059,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltDisplayingErrors";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
@@ -1083,7 +1083,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             try
             {
                 //compiler.setBaseURI(setBaseURI(new URI("http://localhost/stylesheet"));
-                compiler.compile(new StreamSource(new StringReader(stylesheet)));
+                compiler.compile(stylesheet.AsSource());
                 Console.WriteLine("Stylesheet compilation succeeded");
             }
             catch (Exception)
@@ -1104,7 +1104,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltCapturingErrors";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
@@ -1132,7 +1132,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             try
             {
                 //compiler.BaseUri = new Uri("http://localhost/stylesheet");
-                compiler.compile(new StreamSource(new StringReader(stylesheet)));
+                compiler.compile(stylesheet.AsSource());
                 Console.WriteLine("Stylesheet compilation succeeded");
             }
             catch (Exception)
@@ -1165,7 +1165,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltCapturingMessages";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
 
             // Create a Processor instance.
@@ -1184,7 +1184,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                                       "</xsl:stylesheet>";
 
             //compiler.BaseUri = new Uri("http://localhost/stylesheet");
-            XsltExecutable exec = compiler.compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
+            XsltExecutable exec = compiler.compile(stylesheet.AsSource()); //compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
 
 
             // Create a transformer for the stylesheet.
@@ -1231,7 +1231,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     //    public override string testName => "XsltShowingLineNumbers";
 
-    //    public override void run(URL samplesDir)
+    //    public override void run(Uri samplesDir)
     //    {
 
     //        // Create a Processor instance.
@@ -1282,7 +1282,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltMultipleOutput";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
@@ -1290,10 +1290,10 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             processor.setConfigurationProperty(Feature.TIMING, "true");
 
             // Load the source document
-            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/othello.xml").toURI().toASCIIString()));
+            XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/othello.xml"));
 
             // Create a transformer for the stylesheet.
-            Xslt30Transformer transformer = processor.newXsltCompiler().compile(new StreamSource(new URL(samplesDir, "styles/play.xsl").toURI().toASCIIString())).load30();
+            Xslt30Transformer transformer = processor.newXsltCompiler().Compile(new Uri(samplesDir, "styles/play.xsl")).load30();
 
             // Set the required stylesheet parameter
             //Dictionary<QName, XdmValue> parameters = new() {
@@ -1324,7 +1324,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltUsingIdFunction";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance
             Processor processor = new (false);
@@ -1342,8 +1342,8 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
             DocumentBuilder builder = processor.newDocumentBuilder();
             builder.setDTDValidation(true);
-            builder.setBaseURI(samplesDir.toURI());
-            XdmNode input = builder.build(new StreamSource(new StringReader(doc)));
+            builder.setBaseURI(samplesDir.ToURI());
+            XdmNode input = builder.build(doc.AsSource());
 
             // Define a stylesheet that uses the id() function
             const string stylesheet = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='3.0'>\n" +
@@ -1354,7 +1354,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
             XsltCompiler compiler = processor.newXsltCompiler();
             //compiler.BaseUri = new Uri("http://localhost/stylesheet");
-            XsltExecutable exec = compiler.compile(new StreamSource(new StringReader(stylesheet)));
+            XsltExecutable exec = compiler.compile(stylesheet.AsSource());
 
             // Create a transformer for the stylesheet
             Xslt30Transformer transformer = exec.load30();
@@ -1384,13 +1384,13 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltUsingResultHandler";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
 
             // Load the source document
-            XdmNode input = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/othello.xml").toURI().toASCIIString()));
+            XdmNode input = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/othello.xml"));
 
             // Define a stylesheet that splits the document up
             const string stylesheet = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='3.0'>\n" +
@@ -1405,7 +1405,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
             XsltCompiler compiler = processor.newXsltCompiler();
             //compiler.BaseUri = new Uri("http://localhost/stylesheet");
-            XsltExecutable exec = compiler.compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
+            XsltExecutable exec = compiler.compile(stylesheet.AsSource()); //compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
 
             // Create a transformer for the stylesheet.
             Xslt30Transformer transformer = exec.load30();
@@ -1423,7 +1423,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
             // Transform the source XML to a NullDestination (because we only want the secondary result files).
             NullDestination destination = new();// { BaseUri = samplesDir };
-            destination.setDestinationBaseURI(samplesDir.toURI());
+            destination.setDestinationBaseURI(samplesDir.ToURI());
             transformer.applyTemplates(input, destination);
 
             // Process the captured DOM results
@@ -1473,7 +1473,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
     {
         public override string testName => "XsltUsingCollectionFinder";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
@@ -1513,16 +1513,16 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 makeExplicitResourceCollection(
                     processor,
                     collectionURI,
-                    new string[] {
-                        new URL(samplesDir, "data/books.xml").toURI().toASCIIString(),
-                        new URL(samplesDir, "data/othello.xml").toURI().toASCIIString()
+                    new Uri[] {
+                        new Uri(samplesDir, "data/books.xml"),
+                        new Uri(samplesDir, "data/othello.xml")
                     }
                )
             );
 
             XsltCompiler compiler = processor.newXsltCompiler();
             //compiler.BaseUri = new Uri("http://localhost/stylesheet");
-            XsltExecutable exec = compiler.compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
+            XsltExecutable exec = compiler.compile(stylesheet.AsSource()); //.compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
 
             // Create a transformer for the stylesheet.
             Xslt30Transformer transformer = exec.load30();
@@ -1538,12 +1538,12 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         }
 
-        private ResourceCollection makeExplicitResourceCollection(Processor processor, string collectionURI, IEnumerable<string> documentURIs)
+        private ResourceCollection makeExplicitResourceCollection(Processor processor, string collectionURI, IEnumerable<Uri> documentURIs)
         {
             var resourceList = new java.util.ArrayList();
             foreach (var documentURI in documentURIs)
             {
-                var doc = processor.newDocumentBuilder().build(new StreamSource(documentURI));
+                var doc = processor.newDocumentBuilder().Build(documentURI);
                 resourceList.add(new XmlResource(doc.getUnderlyingNode()));
             }
             return new ExplicitCollection(processor.getUnderlyingConfiguration(), collectionURI, resourceList);
@@ -1580,7 +1580,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltUsingDirectoryCollection";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             // Create a Processor instance.
             Processor processor = new(false);
@@ -1600,7 +1600,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
             XsltCompiler compiler = processor.newXsltCompiler();
             //compiler.BaseUri = new Uri("http://localhost/stylesheet");
-            XsltExecutable exec = compiler.compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
+            XsltExecutable exec = compiler.compile(stylesheet.AsSource()); //.compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
 
             // Create a transformer for the stylesheet.
             Xslt30Transformer transformer = exec.load30();
@@ -1628,7 +1628,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltIntegratedExtension";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
 
             // Create a Processor instance.
@@ -1657,7 +1657,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             processor.registerExtensionFunction(new DefaultNamespace());
 
             // Create a transformer for the stylesheet.
-            Xslt30Transformer transformer = processor.newXsltCompiler().compile(new StreamSource(new StringReader(stylesheet))).load30();
+            Xslt30Transformer transformer = processor.newXsltCompiler().compile(stylesheet.AsSource()).load30();
 
             // Create a serializer, with output to the standard output stream
             Serializer serializer = processor.newSerializer();
@@ -1856,7 +1856,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltSimpleExtension";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
 
             // Create a Processor instance.
@@ -1882,7 +1882,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 //arg => arg[0].Empty ? XdmEmptySequence.Instance : new XdmAtomicValue(Math.Sqrt(((XdmAtomicValue)arg[0]).AsDouble())));
 
             // Create a transformer for the stylesheet.
-            Xslt30Transformer transformer = processor.newXsltCompiler().compile(new StreamSource(new StringReader(stylesheet))).load30();
+            Xslt30Transformer transformer = processor.newXsltCompiler().compile(stylesheet.AsSource()).load30();
 
             // Create a serializer, with output to the standard output stream
             Serializer serializer = processor.newSerializer();
@@ -1929,12 +1929,12 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XQueryToStream";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             Processor processor = new(true);
             XQueryCompiler compiler = processor.newXQueryCompiler();
             //compiler.setBaseUri(samplesDir;
-            compiler.setBaseURI(samplesDir.toURI());
+            compiler.setBaseURI(samplesDir.ToURI());
             compiler.declareNamespace("saxon", "http://saxon.sf.net/");
             XQueryExecutable exp = compiler.compile("<saxon:example>{static-base-uri()}</saxon:example>");
             XQueryEvaluator eval = exp.load();
@@ -1959,7 +1959,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XQueryToAtomicValue";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             Processor processor = new(false);
             XQueryCompiler compiler = processor.newXQueryCompiler();
@@ -1983,7 +1983,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XQueryToSequence";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             Processor processor = new(false);
             XQueryCompiler compiler = processor.newXQueryCompiler();
@@ -2008,7 +2008,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     //    public override string testName => "XQueryToDom";
 
-    //    public override void run(URL samplesDir)
+    //    public override void run(Uri samplesDir)
     //    {
     //        Processor processor = new(false);
 
@@ -2037,13 +2037,13 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XQueryToXdm";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             Processor processor = new(false);
 
             DocumentBuilder loader = processor.newDocumentBuilder();
-            loader.setBaseURI(new URL(samplesDir, "data/books.xml").toURI());
-            XdmNode indoc = loader.build(new StreamSource(loader.getBaseURI().toASCIIString()));
+            loader.setBaseURI(new Uri(samplesDir, "data/books.xml").ToURI());
+            XdmNode indoc = loader.Build(new Uri(loader.getBaseURI().toASCIIString()));
 
             XQueryCompiler compiler = processor.newXQueryCompiler();
             XQueryExecutable exp = compiler.compile("<doc>{reverse(/*/*)}</doc>");
@@ -2066,12 +2066,12 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XQueryCallFunction";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             Processor processor = new(false);
 
             XQueryCompiler qc = processor.newXQueryCompiler();
-            URL uri = new(samplesDir, "data/books.xml");
+            Uri uri = new(samplesDir, "data/books.xml");
             XQueryExecutable exp1 = qc.compile("declare namespace f='f.ns';" +
                    "declare variable $z := 1 + xs:integer(doc-available('" + uri.ToString() + "'));" +
                    "declare variable $p as xs:integer external;" +
@@ -2100,7 +2100,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     //    public override string testName => "XQueryFromXmlReader";
 
-    //    public override void run(URL samplesDir)
+    //    public override void run(Uri samplesDir)
     //    {
     //        Processor processor = new(false);
 
@@ -2142,7 +2142,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XQueryToSerializedSequence";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             Processor processor = new(false);
             //string inputFileName = new Uri(samplesDir, "data/books.xml").ToString();
@@ -2160,7 +2160,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             //};
             //XmlReader validator = XmlReader.Create(reader, settings);  // TODO: NOT USED!!
 
-            XdmNode doc = processor.newDocumentBuilder().build(new StreamSource(new URL(samplesDir, "data/books.xml").toURI().toASCIIString()));
+            XdmNode doc = processor.newDocumentBuilder().Build(new Uri(samplesDir, "data/books.xml"));
 
             XQueryCompiler compiler = processor.newXQueryCompiler();
             XQueryExecutable exp = compiler.compile("//ISBN");
@@ -2186,7 +2186,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XQueryUsingParameter";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             Processor processor = new(false);
             XQueryCompiler compiler = processor.newXQueryCompiler();
@@ -2212,7 +2212,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XQueryMultiModule";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
 
             const string mod1 = "import module namespace m2 = 'http://www.example.com/module2';" +
@@ -2276,7 +2276,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XQueryTryCatch";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
 
             const string query = "xquery version '3.1'; try {doc('book.xml')}catch * {\"XQuery 3.0 catch clause - file not found.\"}";
@@ -2300,7 +2300,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XQueryExtensibility";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             const string query = "declare namespace ext = \"urn:sampleExtensions\";" +
                                  "<out>" +
@@ -2468,7 +2468,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     //    public override string testName => "XQueryUpdate";
 
-    //    public override void run(URL samplesDir)
+    //    public override void run(Uri samplesDir)
     //    {
     //        Processor processor = new(true);
 
@@ -2541,7 +2541,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     //    public override string testName => "XQuerySchemaAware";
 
-    //    public override void run(URL samplesDir)
+    //    public override void run(Uri samplesDir)
     //    {
     //        Processor processor = new(true);
 
@@ -2572,7 +2572,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     //    public override string testName => "XPathSchemaAware";
 
-    //    public override void run(URL samplesDir)
+    //    public override void run(Uri samplesDir)
     //    {
     //        Processor processor = new(true);
     //        processor.SchemaManager.compile(new Uri(samplesDir, "data/books.xsd"));
@@ -2609,29 +2609,29 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public override string testName => "XsltStreamDoc";
 
-        public override void run(URL samplesDir)
+        public override void run(Uri samplesDir)
         {
             Processor processor = new(true);
 
             // Create the stylesheet
             string stylesheet = "<xsl:transform version='3.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>\n" +
-                " <xsl:template name='main'>\n" +
-                "  <xsl:source-document streamable='yes' href='" + new URL(samplesDir, "data/othello.xml").ToString() + "'>\n" +
+                " <xsl:template name='xsl:initial-template'>\n" +
+                "  <xsl:source-document streamable='yes' href='" + new Uri(samplesDir, "data/othello.xml").AbsoluteUri + "'>\n" +
                 "   <xsl:value-of select=\"count(copy-of(//LINE)[count(tokenize(.)) &gt; 0] )\" />\n" +
                 "  </xsl:source-document>\n" +
                 " </xsl:template>\n" +
                 "</xsl:transform>";
 
             // Create a transformer for the stylesheet.
-            Xslt30Transformer transformer = processor.newXsltCompiler().compile(new StreamSource(new StringReader(stylesheet))).load30();
+            Xslt30Transformer transformer = processor.newXsltCompiler().compile(stylesheet.AsSource()).load30();
 
             // Create a serializer, with output to the standard output stream
             Serializer serializer = processor.newSerializer();
             serializer.setOutputStream(java.lang.System.@out);
             serializer.setOutputProperty(Serializer.Property.INDENT, "yes");
 
-            // Transform the source XML, calling a named initial template, and serialize the result document.
-            transformer.callTemplate(new QName("main"), serializer);
+            // Transform the source XML, calling the initial template, and serialize the result document.
+            transformer.callTemplate(null, serializer);
         }
 
     }
@@ -2646,7 +2646,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
     //    public override string testName => "Validate";
 
-    //    public override void run(URL samplesDir)
+    //    public override void run(Uri samplesDir)
     //    {
     //        // Load a schema
 
@@ -2801,5 +2801,51 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 return null;
             }
         }
+    }
+
+    public static class S9ApiHelpers
+    {
+        public static URI ToURI(this Uri uri)
+        {
+            return new URI(uri.AbsoluteUri);
+        }
+        public static Source AsSource(this string sourceString)
+        {
+            return new StreamSource(new java.io.StringReader(sourceString));
+        }
+        public static Source AsSource(this Uri uri)
+        {
+            return new StreamSource(new URI(uri.AbsoluteUri).toASCIIString());
+        }
+
+        public static XdmNode Build(this DocumentBuilder docBuilder, Uri uri)
+        {
+            return docBuilder.build(uri.AsSource());
+        }
+
+        public static XdmNode Build(this DocumentBuilder docBuilder, FileInfo file)
+        {
+            return docBuilder.build(new java.io.File(file.FullName));
+        }
+        public static XsltExecutable Compile(this XsltCompiler compiler, Uri uri)
+        {
+            return compiler.compile(uri.AsSource());
+        }
+
+        public static XsltExecutable Compile(this XsltCompiler compiler, FileInfo file)
+        {
+            return compiler.compile(new Uri(file.FullName).AsSource());
+        }
+
+        public static XQueryExecutable Compile(this XQueryCompiler compiler, Uri uri)
+        {
+            return compiler.compile(new URL(uri.AbsoluteUri).openStream());
+        }
+
+        public static XQueryExecutable Compile(this XQueryCompiler compiler, FileInfo file)
+        {
+            return compiler.compile(new java.io.File(file.FullName));
+        }
+
     }
 }
