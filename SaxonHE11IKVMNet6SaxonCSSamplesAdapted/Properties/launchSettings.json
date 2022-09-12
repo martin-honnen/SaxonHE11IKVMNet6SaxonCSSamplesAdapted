@@ -3,6 +3,16 @@
     "SaxonHE11IKVMNet6SaxonCSSamplesAdapted": {
       "commandName": "Project",
       "commandLineArgs": "-ask:no"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": "",
+      "commandLineArgs": " -ask:no"
+    },
+    "WSL 2 Ubuntu": {
+      "commandName": "WSL",
+      "distributionName": "Ubuntu-22.04",
+      "commandLineArgs": "-ask:no"
     }
   }
 }
