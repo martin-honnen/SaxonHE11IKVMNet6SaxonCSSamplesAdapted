@@ -1,15 +1,12 @@
 ﻿using net.liberty_development.SaxonHE11s9apiExtensions;
 
+using System.Reflection;
+
 using net.sf.saxon.expr;
 using net.sf.saxon.lib;
 using net.sf.saxon.s9api;
 
 using URI = java.net.URI;
-
-using java.io;
-using Console = System.Console;
-using File = System.IO.File;
-using System.Reflection;
 
 using net.sf.saxon.om;
 using net.sf.saxon.value;
@@ -529,8 +526,8 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
             // Create a serializer
             const string outfile = "OutputFromXsltSimple2.xml";
-            Serializer serializer = processor.newSerializer();
-            serializer.setOutputStream(new FileOutputStream(outfile)); //serializer.OutputStream = new FileStream(outfile, FileMode.Create, FileAccess.Write);
+            Serializer serializer = processor.NewSerializer(new FileInfo(outfile));
+            //serializer.SetOutputFile();//setOutputStream(new FileOutputStream(outfile)); //serializer.OutputStream = new FileStream(outfile, FileMode.Create, FileAccess.Write);
 
             // Transform the source XML and serialize the result to the output file.
             transformer.applyTemplates(input, serializer);
@@ -1934,11 +1931,11 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             compiler.declareNamespace("saxon", "http://saxon.sf.net/");
             XQueryExecutable exp = compiler.compile("<saxon:example>{static-base-uri()}</saxon:example>");
             XQueryEvaluator eval = exp.load();
-            Serializer qout = processor.newSerializer();
+            Serializer qout = processor.NewSerializer(new FileInfo("testoutput.xml"));
             qout.setOutputProperty(Serializer.Property.METHOD, "xml");
             qout.setOutputProperty(Serializer.Property.INDENT, "yes");
             //qout.setOutputProperty(Serializer.SAXON_INDENT_SPACES, "1");
-            qout.setOutputStream(new FileOutputStream("testoutput.xml"));
+            //qout.SetOutputFile();//setOutputStream(new FileOutputStream("testoutput.xml"));
             Console.WriteLine("Output written to testoutput.xml");
             eval.run(qout);
         }
