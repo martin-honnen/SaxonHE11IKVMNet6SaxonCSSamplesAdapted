@@ -1,32 +1,28 @@
-﻿using net.sf.saxon.expr;
-using net.sf.saxon.lib;
-using net.sf.saxon.s9api.streams;
-using net.sf.saxon.s9api;
-using net.sf.saxon.type;
-using System.Net;
-using System.Xml;
+﻿using net.liberty_development.SaxonHE11s9apiExtensions;
 
-using URL = java.net.URL;
+using net.sf.saxon.expr;
+using net.sf.saxon.lib;
+using net.sf.saxon.s9api;
+
 using URI = java.net.URI;
-using javax.xml.transform.stream;
-using java.util;
+
 using java.io;
 using Console = System.Console;
 using File = System.IO.File;
 using System.Reflection;
-using StringReader = java.io.StringReader;
+
 using net.sf.saxon.om;
 using net.sf.saxon.value;
-using sun.font;
 using javax.xml.transform;
 using net.sf.saxon.resource;
+using javax.xml.transform.stream;
 
 namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 {
     class Examples
     {
         /// <summary>
-        /// Run Saxon XSLT and XQuery sample applications in Saxon HE 11 IKVM on .NET 6
+        /// Run Saxon XSLT and XQuery sample applications in Saxon HE 11 .NET 6 cross-compiled using IKVM
         /// </summary>
         /// <param name="argv">
         /// <para>Options:</para>
@@ -503,8 +499,8 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             transformer.setGlobalContextItem(input);
 
             // Create a serializer, with output to the standard output stream
-            Serializer serializer = processor.newSerializer();
-            serializer.setOutputStream(java.lang.System.@out);
+            Serializer serializer = processor.NewSerializer(Console.Out);
+            //serializer.setOutputStream(java.lang.System.@out);
 
             // Transform the source XML and serialize the result document
             transformer.applyTemplates(input, serializer);
@@ -580,8 +576,8 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             transformer.setGlobalContextItem(input);
 
             // Create a serializer, with output to the standard output stream
-            Serializer serializer = processor.newSerializer();
-            serializer.setOutputStream(java.lang.System.@out);
+            Serializer serializer = processor.NewSerializer(Console.Out);
+            //serializer.setOutputStream(java.lang.System.@out);
 
             // Transform the source XML and serialize the result document
             transformer.applyTemplates(input, serializer);
@@ -625,11 +621,11 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
             XsltCompiler compiler = processor.newXsltCompiler();
             //compiler.BaseUri = samplesDir;
-            Xslt30Transformer transformer = compiler.compile(stylesheet.AsSource()).load30();
+            Xslt30Transformer transformer = compiler.compile(stylesheet.AsSource(samplesDir.AbsoluteUri)).load30();
 
             // Create a serializer, with output to the standard output stream
-            Serializer serializer = processor.newSerializer();
-            serializer.setOutputStream(java.lang.System.@out);
+            Serializer serializer = processor.NewSerializer(Console.Out);
+            //serializer.setOutputStream(java.lang.System.@out);
 
             // Transform the source XML and serialize the result document
             transformer.applyTemplates(input, serializer);
@@ -665,13 +661,13 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             Console.WriteLine("\n\n----- transform of " + sourceFile1 + " -----");
             Xslt30Transformer transformer1 = templates.load30();
             XdmNode input1 = processor.newDocumentBuilder().Build(new Uri(samplesDir, sourceFile1));
-            transformer1.applyTemplates(input1, processor.newSerializer(java.lang.System.@out));     // default destination is Console.Out
+            transformer1.applyTemplates(input1, processor.NewSerializer(Console.Out));     // default destination is Console.Out
 
             // Do the second transformation
             Console.WriteLine("\n\n----- transform of " + sourceFile2 + " -----");
             Xslt30Transformer transformer2 = templates.load30();
             XdmNode input2 = processor.newDocumentBuilder().Build(new Uri(samplesDir, sourceFile2));
-            transformer2.applyTemplates(input2, processor.newSerializer(java.lang.System.@out));     // default destination is Console.Out
+            transformer2.applyTemplates(input2, processor.NewSerializer(Console.Out));     // default destination is Console.Out
         }
     }
 
@@ -935,10 +931,10 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
                 // The stylesheet is in an external document
 
-                Console.WriteLine("Locating stylesheet at uri = " + new URL(input.getBaseURI().toURL(), href));
+                Console.WriteLine("Locating stylesheet at uri = " + new Uri(input.getBaseURI().ToUri(), href));
 
                 // Fetch and compile the referenced stylesheet
-                exec = processor.newXsltCompiler().Compile(new Uri(new Uri(input.getBaseURI().toASCIIString()), href));
+                exec = processor.newXsltCompiler().Compile(new Uri(input.getBaseURI().ToUri(), href));
             }
 
             // Create a transformer 
@@ -976,10 +972,10 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             Xslt30Transformer transformer = processor.newXsltCompiler().Compile(new Uri(samplesDir, "styles/summarize.xsl")).load30();
 
             // Create a serializer, with output to the standard output stream
-            Serializer serializer = processor.newSerializer();
+            Serializer serializer = processor.NewSerializer(Console.Out);
             serializer.setOutputProperty(Serializer.Property.METHOD, "xml");
             serializer.setOutputProperty(Serializer.Property.INDENT, "no");
-            serializer.setOutputStream(java.lang.System.@out);// = Console.Out;
+            //serializer.setOutputStream(java.lang.System.@out);// = Console.Out;
 
             // Transform the source XML and serialize the result document
             transformer.applyTemplates(input, serializer);
@@ -1020,7 +1016,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             //tw.Write(doc);
             //tw.Flush();
             //Stream instr = new MemoryStream(ms.GetBuffer(), 0, (int)ms.Length);
-            XdmNode input = builder.build(new StreamSource(new StringReader(doc)));
+            XdmNode input = builder.build(doc.AsSource(samplesDir.AbsoluteUri));
 
             // Create a transformer for the stylesheet.
             const string stylesheet = "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='3.0'>" +
@@ -1034,15 +1030,15 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             UserXmlResolver compileTimeResolver = new() { Message = "** Calling compile-time XmlResolver: " };
             compiler.setResourceResolver(compileTimeResolver); //StylesheetModuleResolver = compileTimeResolver.GetResourceResolver();
             //compiler.BaseUri = samplesDir;
-            Xslt30Transformer transformer = compiler.compile(stylesheet.AsSource()).load30();
+            Xslt30Transformer transformer = compiler.compile(stylesheet.AsSource(samplesDir.AbsoluteUri)).load30();
 
             // Set the user-written XmlResolver
             UserXmlResolver runTimeResolver = new() { Message = "** Calling transformation-time XmlResolver: " };
             transformer.setResourceResolver(runTimeResolver);  //XmlDocumentResolver = runTimeResolver.GetResourceResolver();
 
             // Create a serializer
-            Serializer serializer = processor.newSerializer();
-            serializer.setOutputStream(java.lang.System.@out); //.OutputWriter = Console.Out;
+            Serializer serializer = processor.NewSerializer(Console.Out);
+            //serializer.setOutputStream(java.lang.System.@out); //.OutputWriter = Console.Out;
 
             // Transform the source XML and serialize the result document
             transformer.applyTemplates(input, serializer);
@@ -1083,7 +1079,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             try
             {
                 //compiler.setBaseURI(setBaseURI(new URI("http://localhost/stylesheet"));
-                compiler.compile(stylesheet.AsSource());
+                compiler.compile(stylesheet.AsSource("http://localhost/stylesheet"));
                 Console.WriteLine("Stylesheet compilation succeeded");
             }
             catch (Exception)
@@ -1132,7 +1128,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             try
             {
                 //compiler.BaseUri = new Uri("http://localhost/stylesheet");
-                compiler.compile(stylesheet.AsSource());
+                compiler.compile(stylesheet.AsSource("http://localhost/stylesheet"));
                 Console.WriteLine("Stylesheet compilation succeeded");
             }
             catch (Exception)
@@ -1184,7 +1180,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                                       "</xsl:stylesheet>";
 
             //compiler.BaseUri = new Uri("http://localhost/stylesheet");
-            XsltExecutable exec = compiler.compile(stylesheet.AsSource()); //compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
+            XsltExecutable exec = compiler.compile(stylesheet.AsSource("http://localhost/stylesheet")); //compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
 
 
             // Create a transformer for the stylesheet.
@@ -1202,8 +1198,8 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             transformer.setMessageListener(new SimpleMessageListener());
 
             // Create a serializer, with output to the standard output stream
-            Serializer serializer = processor.newSerializer();
-            serializer.setOutputStream(java.lang.System.@out);
+            Serializer serializer = processor.NewSerializer(Console.Out);
+            //serializer.setOutputStream(java.lang.System.@out);
 
             // Transform the source XML, calling the initial template, and serialize the result document
             transformer.callTemplate(null, serializer);
@@ -1304,8 +1300,8 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             transformer.setStylesheetParameters(parameters);
 
             // Create a serializer, with output to the standard output stream
-            Serializer serializer = processor.newSerializer();
-            serializer.setOutputStream(java.lang.System.@out);
+            Serializer serializer = processor.NewSerializer(Console.Out);
+            //serializer.setOutputStream(java.lang.System.@out);
 
             // Transform the source XML and serialize the result document
             transformer.applyTemplates(input, serializer);
@@ -1354,7 +1350,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
             XsltCompiler compiler = processor.newXsltCompiler();
             //compiler.BaseUri = new Uri("http://localhost/stylesheet");
-            XsltExecutable exec = compiler.compile(stylesheet.AsSource());
+            XsltExecutable exec = compiler.compile(stylesheet.AsSource("http://localhost/stylesheet"));
 
             // Create a transformer for the stylesheet
             Xslt30Transformer transformer = exec.load30();
@@ -1405,7 +1401,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
             XsltCompiler compiler = processor.newXsltCompiler();
             //compiler.BaseUri = new Uri("http://localhost/stylesheet");
-            XsltExecutable exec = compiler.compile(stylesheet.AsSource()); //compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
+            XsltExecutable exec = compiler.compile(stylesheet.AsSource("http://localhost/stylesheet")); //compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
 
             // Create a transformer for the stylesheet.
             Xslt30Transformer transformer = exec.load30();
@@ -1522,7 +1518,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
             XsltCompiler compiler = processor.newXsltCompiler();
             //compiler.BaseUri = new Uri("http://localhost/stylesheet");
-            XsltExecutable exec = compiler.compile(stylesheet.AsSource()); //.compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
+            XsltExecutable exec = compiler.compile(stylesheet.AsSource("http://localhost/stylesheet")); //.compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
 
             // Create a transformer for the stylesheet.
             Xslt30Transformer transformer = exec.load30();
@@ -1600,7 +1596,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
             XsltCompiler compiler = processor.newXsltCompiler();
             //compiler.BaseUri = new Uri("http://localhost/stylesheet");
-            XsltExecutable exec = compiler.compile(stylesheet.AsSource()); //.compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
+            XsltExecutable exec = compiler.compile(stylesheet.AsSource("http://localhost/stylesheet")); //.compile(new StreamSource(new StringReader(stylesheet), "http://localhost/stylesheet"));
 
             // Create a transformer for the stylesheet.
             Xslt30Transformer transformer = exec.load30();
@@ -1660,8 +1656,8 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             Xslt30Transformer transformer = processor.newXsltCompiler().compile(stylesheet.AsSource()).load30();
 
             // Create a serializer, with output to the standard output stream
-            Serializer serializer = processor.newSerializer();
-            serializer.setOutputStream(java.lang.System.@out);// = Console.Out;
+            Serializer serializer = processor.NewSerializer(Console.Out);
+            //serializer.setOutputStream(java.lang.System.@out);// = Console.Out;
             serializer.setOutputProperty(Serializer.Property.INDENT, "yes");
 
             // Transform the source XML, calling a named initial template, and serialize the result document
@@ -1885,8 +1881,8 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             Xslt30Transformer transformer = processor.newXsltCompiler().compile(stylesheet.AsSource()).load30();
 
             // Create a serializer, with output to the standard output stream
-            Serializer serializer = processor.newSerializer();
-            serializer.setOutputStream(java.lang.System.@out);
+            Serializer serializer = processor.NewSerializer(Console.Out);
+            //serializer.setOutputStream(java.lang.System.@out);
             serializer.setOutputProperty(Serializer.Property.INDENT, "yes");
 
             // Transform the source XML, calling a named initial template, and serialize the result document
@@ -2259,7 +2255,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 if (moduleMap.ContainsKey(module))
                 {
                     return new[] {
-                        new StreamSource(new StringReader(moduleMap[module]), module)                   
+                        moduleMap[module].AsSource(module) as StreamSource //new StreamSource(new StringReader(moduleMap[module]), module)                   
                     };
                 }
                 return null;
@@ -2285,7 +2281,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             XQueryCompiler compiler = processor.newXQueryCompiler();
             XQueryExecutable exp = compiler.compile(query);
             XQueryEvaluator eval = exp.load();
-            Serializer qout = processor.newSerializer(java.lang.System.@out);
+            Serializer qout = processor.NewSerializer(Console.Out);
             eval.run(qout);
         }
 
@@ -2338,7 +2334,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             XQueryCompiler compiler = processor.newXQueryCompiler();
             XQueryExecutable exp = compiler.compile(query);
             XQueryEvaluator eval = exp.load();
-            Serializer qout = processor.newSerializer(java.lang.System.@out);
+            Serializer qout = processor.NewSerializer(Console.Out);
             eval.run(qout);
         }
 
@@ -2626,8 +2622,8 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
             Xslt30Transformer transformer = processor.newXsltCompiler().compile(stylesheet.AsSource()).load30();
 
             // Create a serializer, with output to the standard output stream
-            Serializer serializer = processor.newSerializer();
-            serializer.setOutputStream(java.lang.System.@out);
+            Serializer serializer = processor.NewSerializer(Console.Out);
+            //serializer.setOutputStream(java.lang.System.@out);
             serializer.setOutputProperty(Serializer.Property.INDENT, "yes");
 
             // Transform the source XML, calling the initial template, and serialize the result document.
@@ -2789,12 +2785,12 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
             if (uri.EndsWith(".txt"))
             {
-                return new StreamSource(new StringReader("<uri>" + uri + "</uri>"), uri);
+                return ("<uri>" + uri + "</uri>").AsSource(uri);//new StreamSource(new StringReader("<uri>" + uri + "</uri>"), uri);
             }
 
             if (uri.ToString().EndsWith("empty.xslt"))
             {
-                return new StreamSource(new StringReader("<transform xmlns='http://www.w3.org/1999/XSL/Transform' version='3.0'/>"), uri);
+                return "<transform xmlns='http://www.w3.org/1999/XSL/Transform' version='3.0'/>".AsSource(uri);//new StreamSource(new StringReader("<transform xmlns='http://www.w3.org/1999/XSL/Transform' version='3.0'/>"), uri);
             }
             else
             {
@@ -2803,49 +2799,4 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
         }
     }
 
-    public static class S9ApiHelpers
-    {
-        public static URI ToURI(this Uri uri)
-        {
-            return new URI(uri.AbsoluteUri);
-        }
-        public static Source AsSource(this string sourceString)
-        {
-            return new StreamSource(new java.io.StringReader(sourceString));
-        }
-        public static Source AsSource(this Uri uri)
-        {
-            return new StreamSource(new URI(uri.AbsoluteUri).toASCIIString());
-        }
-
-        public static XdmNode Build(this DocumentBuilder docBuilder, Uri uri)
-        {
-            return docBuilder.build(uri.AsSource());
-        }
-
-        public static XdmNode Build(this DocumentBuilder docBuilder, FileInfo file)
-        {
-            return docBuilder.build(new java.io.File(file.FullName));
-        }
-        public static XsltExecutable Compile(this XsltCompiler compiler, Uri uri)
-        {
-            return compiler.compile(uri.AsSource());
-        }
-
-        public static XsltExecutable Compile(this XsltCompiler compiler, FileInfo file)
-        {
-            return compiler.compile(new Uri(file.FullName).AsSource());
-        }
-
-        public static XQueryExecutable Compile(this XQueryCompiler compiler, Uri uri)
-        {
-            return compiler.compile(new URL(uri.AbsoluteUri).openStream());
-        }
-
-        public static XQueryExecutable Compile(this XQueryCompiler compiler, FileInfo file)
-        {
-            return compiler.compile(new java.io.File(file.FullName));
-        }
-
-    }
 }
