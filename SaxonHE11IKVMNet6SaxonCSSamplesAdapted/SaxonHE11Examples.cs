@@ -88,7 +88,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 //new Validate()
             };
 
-            bool ask = true;
+            bool ask = true; // argv.Length == 0 ? false : true;
             string test = "all";
 
             string samplesPath = null;
