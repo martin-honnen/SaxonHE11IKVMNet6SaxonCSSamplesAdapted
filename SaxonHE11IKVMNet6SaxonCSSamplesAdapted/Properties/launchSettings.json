@@ -12,7 +12,7 @@
     "WSL 2 Ubuntu": {
       "commandName": "WSL",
       "distributionName": "Ubuntu-22.04",
-      "commandLineArgs": "-ask:no"
+      "commandLineArgs": ""
     }
   }
 }

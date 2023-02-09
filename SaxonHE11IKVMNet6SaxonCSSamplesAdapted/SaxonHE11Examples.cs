@@ -33,9 +33,9 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
 
         public static void Main(string[] argv)
         {
-            // force loading of updated xmlresolver
-            ikvm.runtime.Startup.addBootClassPathAssembly(Assembly.Load("org.xmlresolver.xmlresolver"));
-            ikvm.runtime.Startup.addBootClassPathAssembly(Assembly.Load("org.xmlresolver.xmlresolver_data"));
+            // force loading of updated xmlresolver (hopefully no longer needed with HE 11.5)
+            //ikvm.runtime.Startup.addBootClassPathAssembly(Assembly.Load("org.xmlresolver.xmlresolver"));
+            //ikvm.runtime.Startup.addBootClassPathAssembly(Assembly.Load("org.xmlresolver.xmlresolver_data"));
 
             Example[] examples = {
                 //new XdmNavigation(),
@@ -88,7 +88,7 @@ namespace SaxonHE11IKVMNet6SaxonCSSamplesAdapted
                 //new Validate()
             };
 
-            bool ask = true;
+            bool ask = argv.Length == 0 ? false : true;
             string test = "all";
 
             string samplesPath = null;
