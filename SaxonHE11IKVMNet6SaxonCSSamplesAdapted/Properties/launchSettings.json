@@ -5,9 +5,9 @@
       "commandLineArgs": "-ask:no"
     },
     "WSL": {
-      "commandName": "WSL2",
+      "commandName": "WSL",
       "distributionName": "",
-      "commandLineArgs": " -ask:no"
+      "commandLineArgs": ""
     },
     "WSL 2 Ubuntu": {
       "commandName": "WSL",
