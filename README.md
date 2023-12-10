@@ -17,7 +17,7 @@ My extension project https://github.com/martin-honnen/SaxonHE11s9apiExtensions i
 ```
   <ItemGroup>
     <!--<PackageReference Include="IKVM.Maven.Sdk" Version="1.6.2" />-->
-    <PackageReference Include="SaxonHE11s9apiExtensions" Version="11.6.8.8" />
+    <PackageReference Include="SaxonHE11s9apiExtensions" Version="11.6.8.9" />
     <MavenReference Include="net.sf.saxon:Saxon-HE" version="11.6" />
     <!--<MavenReference Include="org.xmlresolver:xmlresolver" Version="4.5.1" />
     <MavenReference Include="org.xmlresolver:xmlresolver" Category="data" Version="4.5.1" />-->
@@ -31,7 +31,7 @@ using net.sf.saxon.s9api;
 using net.liberty_development.SaxonHE11s9apiExtensions;
 using System.Reflection;
 
-// force loading of updated xmlresolver (no longer necessary for HE 11.5)
+// force loading of updated xmlresolver (no longer necessary for HE 11.6)
 //ikvm.runtime.Startup.addBootClassPathAssembly(Assembly.Load("org.xmlresolver.xmlresolver"));
 //ikvm.runtime.Startup.addBootClassPathAssembly(Assembly.Load("org.xmlresolver.xmlresolver_data"));
 
